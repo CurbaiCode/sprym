@@ -493,12 +493,12 @@ function chapterCatalog(id) { // Get article
 function parseNote(el, note) {
 	if (note.note) {
 		var item = document.createElement("li");
-		item.textContent = note.note + ".";
+		item.textContent = note.note;
 		el.appendChild(item);
 	}
-	if (note.explain) {
+	if (note.ie) {
 		var item = document.createElement("li");
-		item.textContent = "IE " + note.explain + ".";
+		item.textContent = "IE " + note.ie;
 		el.appendChild(item);
 	}
 	if (note.greek) {
