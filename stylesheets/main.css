@@ -85,21 +85,21 @@ summary { display: list-item }
 	font-family: "EB Garamond";
 	font-style: normal;
 	font-weight: 100 900;
-	src: url("/fonts/eb-garamond-var-wght.woff2") format("woff2"), url("/fonts/eb-garamond-var-wght.woff") format("woff");
+	src: url("../fonts/eb-garamond-var-wght.woff2") format("woff2"), url("../fonts/eb-garamond-var-wght.woff") format("woff");
 	font-display: swap
 }
 @font-face {
 	font-family: "EB Garamond";
 	font-style: italic;
 	font-weight: 100 900;
-	src: url("/fonts/eb-garamond-italic-var-wght.woff2") format("woff2"), url("/fonts/eb-garamond-italic-var-wght.woff") format("woff");
+	src: url("../fonts/eb-garamond-italic-var-wght.woff2") format("woff2"), url("../fonts/eb-garamond-italic-var-wght.woff") format("woff");
 	font-display: swap
 }
 @font-face {
 	font-family: Lexend;
 	font-style: normal;
 	font-weight: 100 900;
-	src: url("/fonts/lexend-var-wght.woff2") format("woff2"), url("/fonts/lexend-var-wght.woff") format("woff");
+	src: url("../fonts/lexend-var-wght.woff2") format("woff2"), url("../fonts/lexend-var-wght.woff") format("woff");
 	font-display: swap
 }
 :root {
@@ -241,6 +241,9 @@ img {
 }
 * li {
 	cursor: pointer;
+}
+header li {
+	cursor: default;
 }
 #reader {
 	font-family: "EB Garamond", Garamond, serif;

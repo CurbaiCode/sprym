@@ -294,12 +294,12 @@ function slide(page, tab, data = undefined, load = true) {
 }
 
 function libCatalog() { // Get collections
-	readBinaryFile("/library/" + lang + "/library.scl", function (library) {
+	readBinaryFile("library/" + lang + "/library.scl", function (library) {
 		var el = document.getElementById("collections");
 		for (var collection of library) {
 			var item = document.createElement("li");
 			var img = document.createElement("img");
-			img.src = "/library/" + lang + "/" + collection.id + "/display.jpg";
+			img.src = "library/" + lang + "/" + collection.id + "/display.jpg";
 			var label = document.createElement("p");
 			label.textContent = collection.name;
 			(function () {
@@ -329,13 +329,13 @@ function collectionCatalog() { // Get books
 			var item = document.createElement("li");
 			var img = document.createElement("img");
 			var label = document.createElement("p");
-			img.src = "/library/" + lang + "/" + curCollection.id + "/" + bookID + ".spr/cover.jpg";
+			img.src = "library/" + lang + "/" + curCollection.id + "/" + bookID + ".spr/cover.jpg";
 			item.appendChild(img);
 			(function () {
 				var bID = bookID;
 				var i = item;
 				var l = label;
-				readBinaryFile("/library/" + lang + "/" + curCollection.id + "/" + bookID + ".spr/book.stc", function (book) {
+				readBinaryFile("library/" + lang + "/" + curCollection.id + "/" + bookID + ".spr/book.stc", function (book) {
 					l.textContent = book.name;
 					i.addEventListener("click", function () {
 						slide("book", "none", book, document.getElementById("parts").innerHTML == "" || bID != curBook.id); // Load parts the first time, then if different book
@@ -361,7 +361,7 @@ function bookCatalog() { // Get parts
 	while (article.firstChild) { // Clear article
 		article.removeChild(article.lastChild);
 	}
-	readBinaryFile("/library/" + lang + "/" + curCollection.id + "/" + curBook.id + ".spr/book.stc", function (book) {
+	readBinaryFile("library/" + lang + "/" + curCollection.id + "/" + curBook.id + ".spr/book.stc", function (book) {
 		for (var part of book.parts) {
 			var item = document.createElement("li");
 			var label = document.createElement("p");
@@ -428,7 +428,7 @@ function chapterCatalog(id) { // Get article
 	if (id == "stp") {
 		document.getElementById("head").style.display = "none";
 		(function () {
-			readBinaryFile("/library/" + lang + "/" + curCollection.id + "/" + curBook.id + ".spr/book.stp", function (titlePage) {
+			readBinaryFile("library/" + lang + "/" + curCollection.id + "/" + curBook.id + ".spr/book.stp", function (titlePage) {
 				for (var paragraph of titlePage) {
 					var p = document.createElement("p");
 					p.classList.add("tp");
@@ -471,7 +471,7 @@ function chapterCatalog(id) { // Get article
 				}
 				(function () {
 					var c = chapter;
-					readFile("/library/" + lang + "/" + curCollection.id + "/" + curBook.id + ".spr/" + curPart.id + "/" + curChapter.id + ".sch", function (contents) {
+					readFile("library/" + lang + "/" + curCollection.id + "/" + curBook.id + ".spr/" + curPart.id + "/" + curChapter.id + ".sch", function (contents) {
 						document.getElementById("chapter").textContent = c.title || c.name;
 						document.getElementById("summary").textContent = c.summary || "";
 						var body = document.createElement("ol");
@@ -485,7 +485,7 @@ function chapterCatalog(id) { // Get article
 }
 
 function note(link) {
-	readBinaryFile("/library/" + lang + "/" + curCollection.id + "/" + curBook.id + ".spr/" + curPart.id + "/" + curChapter.id + ".snn", function (notes) {
+	readBinaryFile("library/" + lang + "/" + curCollection.id + "/" + curBook.id + ".spr/" + curPart.id + "/" + curChapter.id + ".snn", function (notes) {
 		var l = link;
 		var id = l.id.slice(1);
 		var t;
