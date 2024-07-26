@@ -435,16 +435,19 @@ function chapterCatalog(id) { // Get article
 				for (var paragraph of titlePage) {
 					var p = document.createElement("p");
 					p.classList.add("tp");
-					if (paragraph.length == 1 && paragraph[0].type == "normal") {
+					if (paragraph.length == 1 && paragraph[0].type == "normal") { // A single "normal" item does not need a wrapper
 						p.textContent = paragraph[0].content;
 					} else {
 						for (var x of paragraph) {
 							switch (x.type) {
-								case "heading":
+								case "title":
 									var y = document.createElement("h2");
 									break;
-								case "subheading":
+								case "heading":
 									var y = document.createElement("h3");
+									break;
+								case "subheading":
+									var y = document.createElement("h4");
 									break;
 								case "small":
 									var y = document.createElement("small");
