@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+	<title>Sprym</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+	<meta name="robots" content="noindex,nofollow">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/CurbaiCode/gust-symbols@2.3.1/stylesheets/gustsymbols.min.css">
+	<link rel="stylesheet" href="stylesheets/main.css">
+</head>
+<body>
+	<header>
+		<div>
+			<ul id="head-left">
+				<li><button id="prev" style="visibility:hidden"><i id="prev-icon" class="gs" data-icon="chevron-left"></i><span id="prev-label"></span></button></li>
+			</ul>
+			<div id="head-center">
+				<h1 id="title">Home</h1>
+			</div>
+			<ul id="head-right">
+				<li id="menu"><button><i class="gs">sliders</i></button></li>
+			</ul>
+		</div>
+	</header>
+	<main id="main">
+		<section id="home">
+			<h2>Recents</h2>
+			<ul id="recents" class="list"></ul>
+			<h2>Bookmarks</h2>
+			<ul id="bookmarks"></ul>
+		</section>
+		<section id="library">
+			<ul id="collections" class="tiles"></ul>
+		</section>
+		<section id="collection">
+			<ul id="books" class="tiles"></ul>
+		</section>
+		<section id="book">
+			<ul id="parts" class="list"></ul>
+		</section>
+		<section id="part">
+			<ul id="chapters" class="list"></ul>
+		</section>
+		<section id="reader">
+			<div id="head">
+				<div id="superhead" style="display:none">
+					<h2 id="heading"></h2>
+					<h4 id="subheading"></h4>
+					<p id="intro"></p>
+				</div>
+				<h3 id="chapter"></h3>
+				<p><em id="summary"></em></p>
+			</div>
+			<article id="article"></article>
+		</section>
+		<aside id="inspector">
+			<ul id="notes"></ul>
+		</aside>
+	</main>
+	<nav>
+		<div>
+			<ul id="nav">
+				<li id="home-tab" class="active"><button onclick="slide('home', 'home', null, false)"><i class="gs" data-icon="house-fill"></i><span>Home</span></button></li>
+				<li id="lib-tab" ><button onclick="slide('library', 'lib', null, false)"><i class="gs" data-icon="book-fill"></i><span>Library</span></button></li>
+				<!-- <li id="search-tab"><button onclick="slide('search', 'search', null, false)"><i class="gs" data-icon="magnifyingglass"></i><span>Search</span></button></li> -->
+			</ul>
+		</div>
+	</nav>
+	<script src="https://cdn.jsdelivr.net/gh/CurbaiCode/gust-symbols@2.3.1/scripts/gustsymbols.min.js"></script>
+	<script src="scripts/msgpackr.min.js"></script>
+	<script src="scripts/main.js"></script>
+</body>
+</html>
