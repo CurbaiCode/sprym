@@ -1,6 +1,6 @@
 var lang = "eng";
 var translation = false;
-var libraryCache, collectionCache, bookCache, partCache;
+var libraryCache, collectionCache, bookCache, partCache, noteCache;
 var curCollection, curBook, curPart, curChapter;
 
 function mode(b) {
@@ -361,6 +361,7 @@ function bookCatalog() { // Get parts
 	while (article.firstChild) { // Clear article
 		article.removeChild(article.lastChild);
 	}
+	noteCache = null; // Clear notes
 	readBinaryFile("library/" + lang + "/" + curCollection.id + "/" + curBook.id + ".spr/book.stc", function (book) {
 		for (var part of book.parts) {
 			var item = document.createElement("li");
@@ -404,6 +405,7 @@ function partCatalog() { // Get chapters
 		while (article.firstChild) { // Clear article
 			article.removeChild(article.lastChild);
 		}
+		noteCache = null; // Clear notes
 		for (var chapter of chapters) {
 			var item = document.createElement("li");
 			var label = document.createElement("p");
@@ -425,6 +427,7 @@ function chapterCatalog(id) { // Get article
 	while (article.firstChild) { // Clear article
 		article.removeChild(article.lastChild);
 	}
+	noteCache = null; // Clear notes
 	if (id == "stp") {
 		document.getElementById("head").style.display = "none";
 		(function () {
@@ -484,61 +487,71 @@ function chapterCatalog(id) { // Get article
 	}
 }
 
+function parseNote(el, note) {
+	if (note.note) {
+		var item = document.createElement("li");
+		item.textContent = note.note + ".";
+		el.appendChild(item);
+	}
+	if (note.explain) {
+		var item = document.createElement("li");
+		item.textContent = "IE " + note.explain + ".";
+		el.appendChild(item);
+	}
+	if (note.greek) {
+		var item = document.createElement("li");
+		item.textContent = "GR " + note.greek;
+		el.appendChild(item);
+	}
+	if (note.jst) {
+		var item = document.createElement("li");
+		while (match = /`(.*?)`/g.exec(note.jst)) { // Emphasize ` `
+			note.jst = note.jst.replace(match[0], "<em>" + match[1] + "</em>");
+		}
+		item.innerHTML = "JST " + note.jst;
+		el.appendChild(item);
+	}
+	if (note.cross) {
+		for (var n of note.cross) {
+			var item = document.createElement("li");
+			item.textContent = n;
+			el.appendChild(item);
+		}
+	}
+	if (note.tg) {
+		for (var n of note.tg) {
+			var item = document.createElement("li");
+			item.textContent = "TG " + n;
+			el.appendChild(item);
+		}
+	}
+}
 function note(link) {
-	readBinaryFile("library/" + lang + "/" + curCollection.id + "/" + curBook.id + ".spr/" + curPart.id + "/" + curChapter.id + ".snn", function (notes) {
-		var l = link;
-		var id = l.id.slice(1);
-		var t;
-		for (var child of l.childNodes) { // Search for title label
-			if (child.nodeType == Node.TEXT_NODE) {
-				t = id + " " + child.nodeValue;
-				break;
-			}
+	var id = link.id.slice(1);
+	var t;
+	for (var child of link.childNodes) { // Search for title label
+		if (child.nodeType == Node.TEXT_NODE) {
+			t = id + " " + child.nodeValue;
+			break;
 		}
-		slide("inspector", "none", t);
-		var el = document.getElementById("notes");
-		while (el.firstChild) { // Clear notes
-			el.removeChild(el.lastChild);
-		}
-		var note = notes[id];
-		if (note.note) {
-			var item = document.createElement("li");
-			item.textContent = note.note + ".";
-			el.appendChild(item);
-		}
-		if (note.explain) {
-			var item = document.createElement("li");
-			item.textContent = "IE " + note.explain + ".";
-			el.appendChild(item);
-		}
-		if (note.greek) {
-			var item = document.createElement("li");
-			item.textContent = "GR " + note.greek;
-			el.appendChild(item);
-		}
-		if (note.jst) {
-			var item = document.createElement("li");
-			while (match = /`(.*?)`/g.exec(note.jst)) { // Emphasize ` `
-				note.jst = note.jst.replace(match[0], "<em>" + match[1] + "</em>");
-			}
-			item.innerHTML = "JST " + note.jst;
-			el.appendChild(item);
-		}
-		if (note.cross) {
-			for (var n of note.cross) {
-				var item = document.createElement("li");
-				item.textContent = n;
-				el.appendChild(item);
-			}
-		}
-		if (note.tg) {
-			for (var n of note.tg) {
-				var item = document.createElement("li");
-				item.textContent = "TG " + n;
-				el.appendChild(item);
-			}
-		}
-	});
+	}
+	slide("inspector", "none", t);
+	var element = document.getElementById("notes");
+	while (element.firstChild) { // Clear notes
+		element.removeChild(element.lastChild);
+	}
+	if (noteCache) {
+		parseNote(element, noteCache[id]);
+	} else {
+		(function () {
+			var el = element;
+			var i = id;
+			readBinaryFile("library/" + lang + "/" + curCollection.id + "/" + curBook.id + ".spr/" + curPart.id + "/" + curChapter.id + ".snn", function (notes) {
+				parseNote(el, notes[i]);
+				noteCache = notes;
+			});
+		})();
+	}
 }
 // readLines("/eng/scriptures/nt.spr/matt/2.sch", [2, 3, 6, 18, 20, 21, 22], function (selection) {
 // 	console.log(selection);
