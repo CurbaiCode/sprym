@@ -99,7 +99,7 @@ function parse(el, type, text) {
 							t = newSubline.split("~")[1]
 						}
 						while (emMatch = /`(.*?)`/g.exec(t)) { // Emphasize ` `
-							t = t.replace(emMatch[0], '<em>' + emMatch[1] + "</em>");
+							t = t.replace(emMatch[0], '<em class="jst">' + emMatch[1] + "</em>");
 						}
 						var first = true;
 						var u = 0; // Contained verse number

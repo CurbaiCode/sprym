@@ -230,7 +230,7 @@ nav button {
 	width: 100%;
 }
 sup {
-	display: inline-block;
+	display: inline;
 	font-style: italic;
 	-webkit-user-select: none;
 	-ms-user-select: none;
@@ -269,6 +269,9 @@ article li {
 #chapter {
 	text-transform: uppercase;
 	text-align: center;
+}
+#heading {
+	padding: 0 22px;
 }
 article span:not([onclick], li>li>span, .tp>span) {
 	color: var(--accent-accessible);
@@ -500,11 +503,6 @@ nav li:not(.active) .gs {
 /** UI **/
 main>* {
 	padding-bottom: calc(max(env(safe-area-inset-bottom), 2px) + 50px);
-	-ms-overflow-style: none;
-	scrollbar-width: none;
-}
-main>*::-webkit-scrollbar {
-	display: none;
 }
 main>*::after {
 	bottom: calc(env(safe-area-inset-bottom) + 52px);
