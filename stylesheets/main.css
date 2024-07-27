@@ -444,12 +444,18 @@ header button .gs {
 .tiles li {
 	display: flex;
 	flex-direction: column;
-	flex: 0 0 162px;
-	margin: 16px;
+	padding: 16px;
+	width: 33.333%;
+	max-width: fit-content;
 }
 .tiles img {
 	border-radius: 10px;
-	height: 216px;
+	width: 100%;
+	max-width: 162px;
+}
+.tiles p {
+	line-height: 1;
+	margin: 0.5em 0 0;
 }
 .list {
 	display: flex;
@@ -497,6 +503,11 @@ article ol:first-child {
 	counter-reset: verse;
 }
 /** Mobile **/
+@media (max-width: 400px) {
+	.tiles li {
+		width: 50%;
+	}
+}
 nav li:not(.active) .gs {
 	color: var(--inactive);
 }
