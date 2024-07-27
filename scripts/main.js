@@ -305,7 +305,7 @@ function libCatalog() { // Get collections
 			(function () {
 				var c = collection;
 				item.addEventListener("click", function () {
-					slide("collection", "lib", c, document.getElementById("books").innerHTML == ""); // Load if books not already populated
+					slide("collection", "lib", c, document.getElementById("books").innerHTML == "" || c.id != curCollection.id); // Load books the first time, then if different collection
 				});
 			})();
 			item.appendChild(img);
@@ -324,8 +324,11 @@ function collectionCatalog() { // Get books
 		}
 	}
 	if (booklist) { // If found
+		var el = document.getElementById("books");
+		while (el.firstChild) { // Clear books
+			el.removeChild(el.lastChild);
+		}
 		for (var bookID of booklist) {
-			var el = document.getElementById("books");
 			var item = document.createElement("li");
 			var img = document.createElement("img");
 			var label = document.createElement("p");
