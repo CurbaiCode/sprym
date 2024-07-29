@@ -478,11 +478,10 @@ function chapterCatalog(id) { // Get article
 				} else {
 					document.getElementById("superhead").style.display = "none";
 				}
+				document.getElementById("chapter").textContent = chapter.title || chapter.name;
+				document.getElementById("summary").textContent = chapter.summary || "";
 				(function () {
-					var c = chapter;
 					readFile("library/" + lang + "/" + curCollection.id + "/" + curBook.id + ".spr/" + curPart.id + "/" + curChapter.id + ".sch", function (contents) {
-						document.getElementById("chapter").textContent = c.title || c.name;
-						document.getElementById("summary").textContent = c.summary || "";
 						var body = document.createElement("ol");
 						parse(body, "verse", contents);
 						document.getElementById("article").appendChild(body);
