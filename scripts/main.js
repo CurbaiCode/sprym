@@ -8,10 +8,16 @@ function mode(b) {
 		document.body.setAttribute("data-theme", b);
 	}
 }
-window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", function(e) {
+function handler(e) {
 	var storedTheme = localStorage.getItem("theme") || (e.matches ? "dark" : "light");
 	mode(storedTheme);
-})
+}
+var mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+if (mediaQuery.addEventListener) {
+	mediaQuery.addEventListener("change", handler);
+} else {
+	mediaQuery.addListener(handler);
+}
 if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
 	mode("dark");
 }
