@@ -446,9 +446,11 @@ header button .gs {
 	flex-direction: column;
 	padding: 16px;
 	width: 33.333%;
-	max-width: fit-content;
+	max-width: 194px;
 }
 .tiles img {
+	aspect-ratio: 0.75;
+	background-color: var(--secondary-bg);
 	border-radius: 10px;
 	width: 100%;
 	max-width: 162px;
