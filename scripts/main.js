@@ -85,10 +85,9 @@ function parse(el, type, text) {
 						var subCount = 0; // Contained notes
 						var newSubline = match[2];
 						while (submatch = /<([^>]+)>/g.exec(match[2])) { // Mini verse Parse()
-							if (match[2].split("~")[0].startsWith("<") && match[2].split("~")[0].endsWith(">")) { // Special Case: If translation is only a note, then combine notes to avoid superimposition
+							if (match[2].split("~")[0].startsWith("<")) { // Special Case: If translation begins with a note, then combine notes to avoid superimposition
 								newSubline = newSubline.replace(submatch[0], submatch[1]);
 								match[2] = match[2].replace(submatch[0], "");
-								break;
 							}
 							++subCount;
 							ord = ordinal(n + subCount);
@@ -107,7 +106,7 @@ function parse(el, type, text) {
 						if (translation) {
 							t = newSubline.split("~")[1]
 						}
-						while (emMatch = /`(.*?)`/g.exec(t)) { // Emphasize ` `
+						while (emMatch = /`([^\|]+)`/g.exec(t)) { // Emphasize ` `, but not `| `
 							t = t.replace(emMatch[0], '<em class="jst">' + emMatch[1] + "</em>");
 						}
 						var first = true;
@@ -131,7 +130,11 @@ function parse(el, type, text) {
 									f = false;
 									offset = integer(idMatch[2]);
 								}
-								var o = ordinal(count - offset);
+								var net = count - offset;
+								if (net < 0) {
+									net = 0;
+								}
+								var o = ordinal(net);
 								subVerse = subVerse.replace(idMatch[0], idMatch[1] + (v + u - 1) + o + idMatch[3] + o + idMatch[4]);
 								tmp = tmp.replace(idMatch[0], "");
 							}
