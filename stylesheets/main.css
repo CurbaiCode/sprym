@@ -249,8 +249,15 @@ header li {
 	font-family: "EB Garamond", Garamond, serif;
 	font-size: var(--reader-text);
 	font-weight: 400;
+}
+#reader,
+#inspector {
 	padding-left: max(env(safe-area-inset-left), env(safe-area-inset-right), 48px);
 	padding-right: max(env(safe-area-inset-left), env(safe-area-inset-right), 48px);
+}
+#notes {
+	list-style: none;
+	padding: 0;
 }
 #head,
 #article {
