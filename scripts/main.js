@@ -72,7 +72,7 @@ function parse(el, type, text) {
 		for (var line of text.split(/\n(?![^\^]*\/\^)/g)) { // Preserve translation group newlines
 			if (line != "") {
 				var item = document.createElement("li");
-				item.id = "v" + v;
+				item.id = "p" + v;
 				var n = 0; // Note number
 				while (match = /<\|([^>]+)>/g.exec(line)) { // Preserve grouped clarity
 					line = line.replace(match[0], "`|" + match[1] + "`");
@@ -103,8 +103,10 @@ function parse(el, type, text) {
 						ord = ordinal(n);
 						sup = "<sup>" + ord + "</sup>";
 						var t = newSubline.split("~")[0];
+						var originalLen = t.split("\n").length;
 						if (translation) {
-							t = newSubline.split("~")[1]
+							t = newSubline.split("~")[1];
+							var translationLen = t.split("\n").length;
 						}
 						while (emMatch = /`([^\|]+?)`/g.exec(t)) { // Emphasize ` `, but not `| `
 							t = t.replace(emMatch[0], '<em class="jst">' + emMatch[1] + "</em>");
@@ -114,7 +116,12 @@ function parse(el, type, text) {
 						for (var verse of t.split("\n")) {
 							++u;
 							if (!first) { // First verse is the container
-								t = t.replace(verse, '<li id="v' + (v + u) + '"><span>' + verse + "</span></li>");
+								console.log(u, originalLen);
+								if (u <= originalLen) {
+									t = t.replace(verse, '<li id="p' + (v + u - 1) + '"><span>' + verse + "</span></li>");
+								} else {
+									t = t.replace(verse, "<li><span>" + verse + "</span></li>");
+								}
 								n = 0;
 							} else {
 								first = false;
@@ -151,8 +158,11 @@ function parse(el, type, text) {
 							newLine = newLine.replace(match[0], html + t.join(" "));
 						}
 						n = n + subCount; // Add contained notes
-						item.id = "v" + v; // I don't know why this works
+						item.id = "p" + v; // I don't know why this works
 						v = v + u - 1; // Reset verse number for following verses
+						if (translation) {
+							v = v - (translationLen - originalLen);
+						}
 					} else {
 						newLine = newLine.replace(match[0], '<span id="n' + v + ord + '" onclick="note(this)">' + sup + match[1] + "</span>");
 					}
