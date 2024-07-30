@@ -74,6 +74,9 @@ function parse(el, type, text) {
 				var item = document.createElement("li");
 				item.id = "v" + v;
 				var n = 0; // Note number
+				while (match = /<\|([^>]+)>/g.exec(line)) { // Preserve grouped clarity
+					line = line.replace(match[0], "`|" + match[1] + "`");
+				}
 				var newLine = line;
 				while (match = /(?:<([^>]+)>)|(?:\^([^\^]+)\/\^)/g.exec(line)) { // Either < > or ^ /^
 					var ord = ordinal(n);
@@ -90,7 +93,7 @@ function parse(el, type, text) {
 							++subCount;
 							ord = ordinal(n + subCount);
 							sup = "<sup>" + ord + "</sup>";
-							if (submatch[1].startsWith("|")) { // Addition
+							if (submatch[1].startsWith("|")) { // Clarity
 								--subCount;
 								newSubline = newSubline.replace(submatch[0], "<em>" + submatch[1].slice(1) + "</em>");
 							} else {
@@ -147,14 +150,14 @@ function parse(el, type, text) {
 						n = n + subCount; // Add contained notes
 						item.id = "v" + v; // I don't know why this works
 						v = v + u - 1; // Reset verse number for following verses
-					} else if (match[1] && match[1].startsWith("|")) { // Addition
-						--n;
-						newLine = newLine.replace(match[0], "<em>" + match[1].slice(1) + "</em>");
 					} else {
 						newLine = newLine.replace(match[0], '<span id="n' + v + ord + '" onclick="note(this)">' + sup + match[1] + "</span>");
 					}
 					line = line.replace(match[0], "");
 					++n;
+				}
+				while (match = /`\|([^`]+)`/g.exec(newLine)) { // Convert preserved clarity
+					newLine = newLine.replace(match[0], "<em>" + match[1] + "</em>");
 				}
 				item.innerHTML = newLine;
 				el.appendChild(item);
