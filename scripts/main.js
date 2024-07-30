@@ -106,7 +106,7 @@ function parse(el, type, text) {
 						if (translation) {
 							t = newSubline.split("~")[1]
 						}
-						while (emMatch = /`([^\|]+)`/g.exec(t)) { // Emphasize ` `, but not `| `
+						while (emMatch = /`([^\|]+?)`/g.exec(t)) { // Emphasize ` `, but not `| `
 							t = t.replace(emMatch[0], '<em class="jst">' + emMatch[1] + "</em>");
 						}
 						var first = true;
