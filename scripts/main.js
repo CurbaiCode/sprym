@@ -308,6 +308,7 @@ function libCatalog() { // Get collections
 		for (var collection of library) {
 			var item = document.createElement("li");
 			var img = document.createElement("img");
+			img.loading = "lazy";
 			img.src = "library/" + lang + "/" + collection.id + "/display.jpg";
 			var label = document.createElement("p");
 			label.textContent = collection.name;
@@ -341,6 +342,7 @@ function collectionCatalog() { // Get books
 			var item = document.createElement("li");
 			var img = document.createElement("img");
 			var label = document.createElement("p");
+			img.loading = "lazy";
 			img.src = "library/" + lang + "/" + curCollection.id + "/" + bookID + ".spr/cover.jpg";
 			item.appendChild(img);
 			(function () {
