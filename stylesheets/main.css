@@ -313,7 +313,7 @@ main>* {
 	height: 100%;
 	overflow-x: hidden;
 	overflow-y: scroll;
-	transition: right 0.25s;
+	transition: right 0.35s;
 }
 main>*:not(#inspector)::after {
 	content: "";
@@ -324,7 +324,7 @@ main>*:not(#inspector)::after {
 	right: 0;
 	bottom: 0;
 	left: 0;
-	transition: background-color 0.25s;
+	transition: background-color 0.35s;
 }
 #home {
 	z-index: 1;
@@ -354,6 +354,7 @@ main>*:not(.hidden)+* {
 }
 main>.hidden {
 	pointer-events: none;
+	right: 25%;
 }
 main>.hidden::after {
 	background-color: var(--overlay) !important;
