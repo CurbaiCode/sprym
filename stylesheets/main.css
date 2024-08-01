@@ -377,7 +377,7 @@ main>*:not(#inspector)::after {
 	content: "";
 	background-color: transparent;
 	pointer-events: none;
-	position: absolute;
+	position: fixed;
 	top: calc(max(env(safe-area-inset-top), 2px) + 50px);
 	right: 0;
 	bottom: 0;
@@ -602,7 +602,7 @@ main>* {
 	padding-bottom: calc(max(env(safe-area-inset-bottom), 2px) + 50px);
 }
 main>*::after {
-	bottom: calc(env(safe-area-inset-bottom) + 52px);
+	bottom: calc(max(env(safe-area-inset-bottom), 2px) + 50px) !important;
 }
 nav {
 	position: absolute;
