@@ -116,7 +116,6 @@ function parse(el, type, text) {
 						for (var verse of t.split("\n")) {
 							++u;
 							if (!first) { // First verse is the container
-								console.log(u, originalLen);
 								if (u <= originalLen) {
 									t = t.replace(verse, '<li id="p' + (v + u - 1) + '"><span>' + verse + "</span></li>");
 								} else {
@@ -186,7 +185,7 @@ var prev = document.getElementById("prev");
 var prevIcon = document.getElementById("prev-icon");
 var prevLabel = document.getElementById("prev-label");
 var title = document.getElementById("title");
-var pages = document.getElementById("main").children;
+var pages = document.getElementById("content").children;
 var tabs = document.getElementById("nav").children;
 function previous(action, label, hide = "") {
 	switch (hide) {
@@ -233,12 +232,6 @@ function slide(page, tab, data = undefined, load = true) {
 		}
 	}
 	switch (page) {
-		case "search":
-			console.log("SEARCH WIP");
-			previous(function () { console.log("CANCEL SEARCH IGNORED") }, "Cancel", "icon");
-			document.title = "Search | Sprym";
-			title.textContent = "Search";
-			break;
 		case "home":
 			previous(function () {}, "", "button");
 			document.title = "Sprym";
@@ -395,7 +388,6 @@ function bookCatalog() { // Get parts
 			var label = document.createElement("p");
 			label.textContent = part.name;
 			(function () {
-				var b = book;
 				var p = part;
 				if (p.type == "skip") {
 					if (p.id == "stp") {
@@ -585,3 +577,21 @@ function note(link) {
 // readLines("/eng/scriptures/nt.spr/matt/2.sch", [2, 3, 6, 18, 20, 21, 22], function (selection) {
 // 	console.log(selection);
 // });
+
+function menu(target) {
+	var el = document.getElementById(target);
+	if (el.classList.contains("hidden")) {
+		el.classList.remove("hidden");
+		setTimeout(function () {
+			document.addEventListener("click", function () {
+				this.removeEventListener("click", arguments.callee);
+				el.classList.add("hidden");
+			});
+		}, 0);
+	} else {
+		el.classList.add("hidden");
+	}
+}
+function modal() {
+	document.body.classList.add("modal");
+}
