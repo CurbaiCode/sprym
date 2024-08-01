@@ -115,8 +115,9 @@ summary { display: list-item }
 	--primary-bg: #ffffff;
 	--secondary-bg: #f2f2f7;
 	--frosted: rgba(255, 255, 255, .8);
-	--frosted-2: rgba(0, 0, 0, .075);
+	--frosted-2: rgba(0, 0, 0, .08);
 	--overlay: rgba(0, 0, 0, .2);
+	--dim: brightness(90%);
 	--active: rgba(0, 0, 0, .08);
 	--inactive: rgba(0, 0, 0, .4);
 	--hover: rgba(0, 0, 0, .05);
@@ -131,8 +132,9 @@ summary { display: list-item }
 	--primary-bg: #1d1d1e;
 	--secondary-bg: #3a3a3b;
 	--frosted: rgba(29, 29, 30, .8);
-	--frosted-2: rgba(0, 0, 0, .15);
+	--frosted-2: rgba(0, 0, 0, .16);
 	--overlay: rgba(0, 0, 0, .4);
+	--dim: brightness(80%);
 	--active: rgba(255, 255, 255, .08);
 	--inactive: rgba(255, 255, 255, .4);
 	--hover: rgba(255, 255, 255, .05);
@@ -160,7 +162,7 @@ body {
 	transition: filter .25s;
 }
 body.modal #main {
-	filter: brightness(88%);
+	filter: var(--dim);
 	transition: filter .35s;
 }
 #modal {
