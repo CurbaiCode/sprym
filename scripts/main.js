@@ -187,7 +187,8 @@ var prevLabel = document.getElementById("prev-label");
 var title = document.getElementById("title");
 var pages = document.getElementById("content").children;
 var tabs = document.getElementById("nav").children;
-function previous(action, label, hide = "") {
+function previous(action, label, hide) {
+	hide = hide || "";
 	switch (hide) {
 		case "button":
 			prev.style.visibility = "hidden";
@@ -204,7 +205,8 @@ function previous(action, label, hide = "") {
 		prevIcon.style.display = "";
 	}
 }
-function slide(page, tab, data = undefined, load = true) {
+function slide(page, tab, data, load) {
+	load = load != undefined ? load : true;
 	if (tab == "none") { // No active tab
 		for (var i = 0; i < tabs.length; i++) {
 			tabs[i].classList.remove("active");
