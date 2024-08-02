@@ -116,6 +116,7 @@ summary { display: list-item }
 	--secondary-bg: #f2f2f7;
 	--frosted: rgba(255, 255, 255, .8);
 	--frosted-2: rgba(0, 0, 0, .08);
+	--shadow: rgba(0, 0, 0, .04);
 	--overlay: rgba(0, 0, 0, .2);
 	--dim: brightness(90%);
 	--active: rgba(0, 0, 0, .08);
@@ -133,6 +134,7 @@ summary { display: list-item }
 	--secondary-bg: #3a3a3b;
 	--frosted: rgba(29, 29, 30, .8);
 	--frosted-2: rgba(0, 0, 0, .16);
+	--shadow: rgba(0, 0, 0, .08);
 	--overlay: rgba(0, 0, 0, .4);
 	--dim: brightness(80%);
 	--active: rgba(255, 255, 255, .08);
@@ -197,7 +199,7 @@ header {
 }
 #toolbar {
 	border-radius: 15px;
-	box-shadow: 10px 10px 20px 0 rgba(0, 0, 0, .04), -10px 0 20px 0 rgba(0, 0, 0, .04);
+	box-shadow: 10px 10px 20px 0 var(--shadow), -10px 0 20px 0 var(--shadow);
 	overflow: hidden;
 	position: absolute;
 	top: calc(100% + 6px);
