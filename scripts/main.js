@@ -18,7 +18,7 @@ if (mediaQuery.addEventListener) {
 } else {
 	mediaQuery.addListener(handler);
 }
-if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
 	mode("dark");
 }
 mode(localStorage.getItem("theme"));
