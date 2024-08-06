@@ -409,14 +409,15 @@ function bookCatalog() { // Get parts
 }
 function partCatalog() { // Get chapters
 	var chapters;
+	var el = document.getElementById("chapters");
 	for (var part of bookCache) { // Search for selected part
 		if (part.id == curPart.id) {
+			el.classList = part.type || "list";
 			chapters = part.chapters;
 			break;
 		}
 	}
 	if (chapters) { // If found
-		var el = document.getElementById("chapters");
 		while (el.firstChild) { // Clear chapters
 			el.removeChild(el.lastChild);
 		}
