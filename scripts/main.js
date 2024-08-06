@@ -389,12 +389,11 @@ function bookCatalog() { // Get parts
 			label.textContent = part.name;
 			(function () {
 				var p = part;
-				if (p.type == "skip") {
-					if (p.id == "stp") {
-						item.addEventListener("click", function () {
-							slide("reader", "none", p);
-						});
-					}
+				if (p.skip == true) {
+					item.classList.add("chapter");
+					item.addEventListener("click", function () {
+						slide("reader", "none", p);
+					});
 				} else {
 					item.addEventListener("click", function () {
 						slide("part", "none", p, document.getElementById("chapters").innerHTML == "" || p.id != (curPart.id || "")); // Load chapters the first time, then if different part
@@ -481,6 +480,18 @@ function chapterCatalog(id) { // Get article
 					}
 					document.getElementById("article").appendChild(p);
 				}
+			});
+		})();
+	} else if (curPart.id == "SKIP") {
+		document.getElementById("head").style.display = "";
+		document.getElementById("heading").textContent = curChapter.title || curChapter.name;
+		document.getElementById("subheading").textContent = curChapter.subtitle || "";
+		document.getElementById("intro").textContent = curChapter.intro || "";
+		document.getElementById("superhead").style.display = "";
+		(function () {
+			var c = curChapter;
+			readFile("library/" + lang + "/" + curCollection.id + "/" + curBook.id + ".spr/" + curChapter.id + ".sch", function (x) {
+				console.log(c, x);
 			});
 		})();
 	} else {
