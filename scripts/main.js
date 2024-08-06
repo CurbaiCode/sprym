@@ -220,17 +220,15 @@ function slide(page, tab, data, load) {
 			}
 		}
 	}
-	if (page != "search") {
-		var x = true;
-		for (var i = 0; i < pages.length; i++) {
-			if (pages[i].id == page) { // Should page be slid
-				x = false;
-			}
-			if (x) {
-				pages[i].classList.add("hidden");
-			} else {
-				pages[i].classList.remove("hidden");
-			}
+	var x = true;
+	for (var i = 0; i < pages.length; i++) {
+		if (pages[i].id == page) { // Should page be slid
+			x = false;
+		}
+		if (x) {
+			pages[i].classList.add("hidden");
+		} else {
+			pages[i].classList.remove("hidden");
 		}
 	}
 	switch (page) {
@@ -582,16 +580,16 @@ function note(link) {
 
 function menu(target) {
 	var el = document.getElementById(target);
-	if (el.classList.contains("hidden")) {
-		el.classList.remove("hidden");
+	if (el.classList.contains("open")) {
+		el.classList.remove("open");
+	} else {
+		el.classList.add("open");
 		setTimeout(function () {
 			document.addEventListener("click", function () {
 				this.removeEventListener("click", arguments.callee);
-				el.classList.add("hidden");
+				el.classList.remove("open");
 			});
 		}, 0);
-	} else {
-		el.classList.add("hidden");
 	}
 }
 function modal() {
