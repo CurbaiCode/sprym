@@ -8,20 +8,35 @@ function mode(b) {
 		document.body.setAttribute("data-theme", b);
 	}
 }
-function handler(e) {
+function modeHandler(e) {
 	var storedTheme = localStorage.getItem("theme") || (e.matches ? "dark" : "light");
 	mode(storedTheme);
 }
-var mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-if (mediaQuery.addEventListener) {
-	mediaQuery.addEventListener("change", handler);
+var modeMQ = window.matchMedia("(prefers-color-scheme: dark)");
+if (modeMQ.addEventListener) {
+	modeMQ.addEventListener("change", modeHandler);
 } else {
-	mediaQuery.addListener(handler);
+	modeMQ.addListener(modeHandler);
 }
 if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
 	mode("dark");
 }
 mode(localStorage.getItem("theme"));
+
+var short = false;
+function shortHandler(e) {
+	short = e.matches ? true : false;
+}
+var shortMQ = window.matchMedia("(max-width: 400px)");
+if (shortMQ.addEventListener) {
+	shortMQ.addEventListener("change", shortHandler);
+} else {
+	shortMQ.addListener(shortHandler);
+}
+if (window.matchMedia && window.matchMedia("(max-width: 400px)").matches) {
+	short = true;
+}
+
 libCatalog();
 
 function readBinaryFile(file, callback) {
@@ -251,7 +266,10 @@ function slide(page, tab, data, load) {
 			}
 			break;
 		case "book":
-			back(function () { slide("collection", "lib", curCollection, false) }, curCollection.short || curCollection.name);
+			if (short) {
+				var ccs = curCollection.short;
+			}
+			back(function () { slide("collection", "lib", curCollection, false) }, ccs || curCollection.name);
 			document.title = data.name || "Book";
 			swap(title, data.name || "Book", .35);
 			curBook = data;
@@ -272,10 +290,13 @@ function slide(page, tab, data, load) {
 		case "reader":
 			var label = data.name;
 			var pLabel = "";
+			if (short) {
+				var cps = curPart.short;
+			}
 			if (curPart.id == "SKIP") { // If part skipped
 				pLabel = curBook.short || curBook.name;
 			} else {
-				pLabel = curPart.short || curPart.name;
+				pLabel = cps || curPart.name;
 			}
 			if (data.short) {
 				label = curPart.name + " " + data.short;
