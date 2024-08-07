@@ -285,7 +285,7 @@ small {
 }
 #title {
 	position: relative;
-	transition: opacity .35s;
+	transition: opacity .175s;
 }
 #title.swapping {
 	opacity: 0;
@@ -534,7 +534,7 @@ header button .gs {
 	transition: opacity .35s;
 }
 #prev-label {
-	transition: opacity .35s;
+	transition: opacity .175s;
 }
 #prev-label.swapping {
 	opacity: 0;
