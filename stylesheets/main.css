@@ -506,8 +506,10 @@ header button {
 	align-items: center;
 	transition: background-color .15s;
 }
-header button:hover {
-	background-color: var(--hover);
+@media (hover: hover) and (pointer: fine) {
+	header button:hover {
+		background-color: var(--hover);
+	}
 }
 header button .gs {
 	flex-shrink: 0;
