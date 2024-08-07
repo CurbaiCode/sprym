@@ -182,27 +182,26 @@ function parse(el, type, text) {
 }
 
 var prev = document.getElementById("prev");
-var prevIcon = document.getElementById("prev-icon");
 var prevLabel = document.getElementById("prev-label");
 var title = document.getElementById("title");
 var pages = document.getElementById("content").children;
 var tabs = document.getElementById("nav").children;
-function previous(action, label, hide) {
+function swap(el, txt, timing) {
+	el.classList.add("swapping");
+	setTimeout(function () {
+		el.textContent = txt;
+		el.classList.remove("swapping");
+	}, timing * 500);
+}
+function back(action, label, hide) {
 	hide = hide || "";
-	switch (hide) {
-		case "button":
-			prev.style.visibility = "hidden";
-			prevIcon.style.display = "";
-			break;
-		case "icon":
-			prevIcon.style.display = "none";
-			prev.style.visibility = "";
+	if (hide == "button") {
+		prev.style.opacity = "0";
 	}
 	prev.onclick = action;
-	prevLabel.textContent = label;
+	swap(prevLabel, label, .35);
 	if (hide == "") {
-		prev.style.visibility = "";
-		prevIcon.style.display = "";
+		prev.style.opacity = "";
 	}
 }
 function slide(page, tab, data, load) {
@@ -233,28 +232,28 @@ function slide(page, tab, data, load) {
 	}
 	switch (page) {
 		case "home":
-			previous(function () {}, "", "button");
+			back(function () {}, "", "button");
 			document.title = "Sprym";
-			title.textContent = "Home";
+			swap(title, "Home", .35);
 			break;
 		case "library":
-			previous(function () { slide("home", "home") }, "");
+			back(function () { slide("home", "home") }, "");
 			document.title = "Library";
-			title.textContent = "Library";
+			swap(title, "Library", .35);
 			break;
 		case "collection":
-			previous(function () { slide("library", "lib") }, "Library");
+			back(function () { slide("library", "lib") }, "Library");
 			document.title = data.name || "Collection";
-			title.textContent = data.name || "Collection";
+			swap(title, data.name || "Collection", .35);
 			curCollection = data;
 			if (load) {
 				collectionCatalog();
 			}
 			break;
 		case "book":
-			previous(function () { slide("collection", "lib", curCollection, false) }, curCollection.short || curCollection.name);
+			back(function () { slide("collection", "lib", curCollection, false) }, curCollection.short || curCollection.name);
 			document.title = data.name || "Book";
-			title.textContent = data.name || "Book";
+			swap(title, data.name || "Book", .35);
 			curBook = data;
 			curPart = { "id": "SKIP" };
 			if (load) {
@@ -262,9 +261,9 @@ function slide(page, tab, data, load) {
 			}
 			break;
 		case "part":
-			previous(function () { slide("book", "none", curBook, false) }, curBook.short || curBook.name);
+			back(function () { slide("book", "none", curBook, false) }, curBook.short || curBook.name);
 			document.title = data.name || "Part";
-			title.textContent = data.name || "Part";
+			swap(title, data.name || "Part", .35);
 			curPart = data;
 			if (load) {
 				partCatalog();
@@ -283,12 +282,12 @@ function slide(page, tab, data, load) {
 				pLabel = "";
 			}
 			if (curPart.id == "SKIP") { // If part skipped
-				previous(function () { slide("book", "none", curBook, false) }, pLabel);
+				back(function () { slide("book", "none", curBook, false) }, pLabel);
 			} else {
-				previous(function () { slide("part", "none", curPart, false) }, pLabel);
+				back(function () { slide("part", "none", curPart, false) }, pLabel);
 			}
 			document.title = label;
-			title.textContent = label || "Chapter";
+			swap(title, label || "Chapter", .35);
 			curChapter = data;
 			if (load) {
 				chapterCatalog(data.id);
@@ -299,12 +298,12 @@ function slide(page, tab, data, load) {
 			if (curChapter.short) {
 				label = (curPart.short || curPart.name) + " " + curChapter.short;
 			}
-			previous(function () { slide("reader", "none", curChapter, false) }, label);
-			title.textContent = data || "Inspector";
+			back(function () { slide("reader", "none", curChapter, false) }, label);
+			swap(title, data || "Inspector", .35);
 			break;
 		default:
 			document.title = "Sprym";
-			title.textContent = "Sprym";
+			swap(title, "Sprym", .35);
 	}
 }
 

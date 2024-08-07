@@ -198,6 +198,13 @@ header {
 	right: 0;
 	z-index: 999;
 }
+.menu button .gs {
+	transition: opacity .35s;
+}
+.open+.menu button .gs {
+	opacity: 0.5;
+	transition: opacity .15s;
+}
 #toolbar {
 	border-radius: 15px;
 	box-shadow: 10px 10px 20px 0 var(--shadow), -10px 0 20px 0 var(--shadow);
@@ -275,6 +282,13 @@ small {
 	font-weight: 500;
 	margin: 0;
 	white-space: nowrap;
+}
+#title {
+	position: relative;
+	transition: opacity .35s;
+}
+#title.swapping {
+	opacity: 0;
 }
 #modal header {
 	border-bottom: 1px solid var(--border);
@@ -517,6 +531,13 @@ header button .gs {
 #prev {
 	line-height: .75;
 	min-height: 34px;
+	transition: opacity .35s;
+}
+#prev-label {
+	transition: opacity .35s;
+}
+#prev-label.swapping {
+	opacity: 0;
 }
 #home>* {
 	margin: 0 23px;
