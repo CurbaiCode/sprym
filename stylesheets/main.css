@@ -528,15 +528,15 @@ header button {
 header button .gs {
 	flex-shrink: 0;
 }
-#prev {
+#back {
 	line-height: .75;
 	min-height: 34px;
 	transition: opacity .35s;
 }
-#prev-label {
+#back-label {
 	transition: opacity .175s;
 }
-#prev-label.swapping {
+#back-label.swapping {
 	opacity: 0;
 }
 #home>* {

@@ -196,8 +196,8 @@ function parse(el, type, text) {
 	}
 }
 
-var prev = document.getElementById("prev");
-var prevLabel = document.getElementById("prev-label");
+var back = document.getElementById("back");
+var backLabel = document.getElementById("back-label");
 var title = document.getElementById("title");
 var pages = document.getElementById("content").children;
 var tabs = document.getElementById("nav").children;
@@ -208,15 +208,15 @@ function swap(el, txt, timing) {
 		el.classList.remove("swapping");
 	}, timing * 500);
 }
-function back(action, label, hide) {
+function setBack(action, label, hide) {
 	hide = hide || "";
 	if (hide == "button") {
-		prev.style.opacity = "0";
+		back.style.opacity = "0";
 	}
-	prev.onclick = action;
-	swap(prevLabel, label, .35);
+	back.onclick = action;
+	swap(backLabel, label, .35);
 	if (hide == "") {
-		prev.style.opacity = "";
+		back.style.opacity = "";
 	}
 }
 function slide(page, tab, data, load) {
@@ -247,17 +247,17 @@ function slide(page, tab, data, load) {
 	}
 	switch (page) {
 		case "home":
-			back(function () {}, "", "button");
+			setBack(function () {}, "", "button");
 			document.title = "Sprym";
 			swap(title, "Home", .35);
 			break;
 		case "library":
-			back(function () { slide("home", "home") }, "");
+			setBack(function () { slide("home", "home") }, "");
 			document.title = "Library";
 			swap(title, "Library", .35);
 			break;
 		case "collection":
-			back(function () { slide("library", "lib") }, "Library");
+			setBack(function () { slide("library", "lib") }, "Library");
 			document.title = data.name || "Collection";
 			swap(title, data.name || "Collection", .35);
 			curCollection = data;
@@ -269,7 +269,7 @@ function slide(page, tab, data, load) {
 			if (short) {
 				var ccs = curCollection.short;
 			}
-			back(function () { slide("collection", "lib", curCollection, false) }, ccs || curCollection.name);
+			setBack(function () { slide("collection", "lib", curCollection, false) }, ccs || curCollection.name);
 			document.title = data.name || "Book";
 			swap(title, data.name || "Book", .35);
 			curBook = data;
@@ -279,7 +279,7 @@ function slide(page, tab, data, load) {
 			}
 			break;
 		case "part":
-			back(function () { slide("book", "none", curBook, false) }, curBook.short || curBook.name);
+			setBack(function () { slide("book", "none", curBook, false) }, curBook.short || curBook.name);
 			document.title = data.name || "Part";
 			swap(title, data.name || "Part", .35);
 			curPart = data;
@@ -303,9 +303,9 @@ function slide(page, tab, data, load) {
 				pLabel = "";
 			}
 			if (curPart.id == "SKIP") { // If part skipped
-				back(function () { slide("book", "none", curBook, false) }, pLabel);
+				setBack(function () { slide("book", "none", curBook, false) }, pLabel);
 			} else {
-				back(function () { slide("part", "none", curPart, false) }, pLabel);
+				setBack(function () { slide("part", "none", curPart, false) }, pLabel);
 			}
 			document.title = label;
 			swap(title, label || "Chapter", .35);
@@ -319,7 +319,7 @@ function slide(page, tab, data, load) {
 			if (curChapter.short) {
 				label = (curPart.short || curPart.name) + " " + curChapter.short;
 			}
-			back(function () { slide("reader", "none", curChapter, false) }, label);
+			setBack(function () { slide("reader", "none", curChapter, false) }, label);
 			swap(title, data || "Inspector", .35);
 			break;
 		default:
