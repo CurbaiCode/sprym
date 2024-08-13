@@ -581,14 +581,15 @@ function parseNote(el, note) {
 }
 function note(link) {
 	var id = link.id.slice(1);
-	var t;
+	var t = "";
 	for (var child of link.childNodes) { // Search for title label
 		if (child.nodeType == Node.TEXT_NODE) {
-			t = id + " " + child.nodeValue;
+			t = child.nodeValue;
 			break;
 		}
 	}
-	slide("inspector", "none", t);
+	slide("inspector", "none", id);
+	document.getElementById("inspector-title").textContent = t;
 	var element = document.getElementById("notes");
 	while (element.firstChild) { // Clear notes
 		element.removeChild(element.lastChild);

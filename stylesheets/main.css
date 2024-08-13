@@ -283,6 +283,10 @@ small {
 	margin: 0;
 	white-space: nowrap;
 }
+#inspector-title {
+	font-size: 1.176rem;
+	font-weight: 500;
+}
 #title {
 	position: relative;
 	transition: opacity .175s;
