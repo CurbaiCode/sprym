@@ -618,9 +618,11 @@ function menu(target) {
 	} else {
 		el.classList.add("open");
 		setTimeout(function () {
-			document.addEventListener("click", function () {
-				this.removeEventListener("click", arguments.callee);
-				el.classList.remove("open");
+			document.addEventListener("click", function (e) {
+				if (!e.target.closest(target) && e.target.tagName.toLowerCase() != "hr") {
+					this.removeEventListener("click", arguments.callee);
+					el.classList.remove("open");
+				}
 			});
 		}, 0);
 	}
