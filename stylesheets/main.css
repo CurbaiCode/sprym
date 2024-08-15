@@ -395,6 +395,10 @@ main>* {
 	overflow-y: scroll;
 	transition: right .35s;
 }
+main>section>* {
+	margin: 0 auto;
+	max-width: 1026px;
+}
 main>*:not(#inspector)::after {
 	content: "";
 	background-color: transparent;
@@ -435,6 +439,9 @@ main>*:not(.hidden)+* {
 main>.hidden {
 	pointer-events: none;
 	right: 25%;
+}
+#reader.hidden {
+	right: 0;
 }
 main>.hidden::after {
 	background-color: var(--overlay) !important;
@@ -545,8 +552,7 @@ header button .gs {
 	opacity: 0;
 }
 #home>* {
-	margin: 0 23px;
-	padding-bottom: 16px;
+	padding: 0 23px 16px;
 }
 #home h2 {
 	font-size: 1.294em;
@@ -656,7 +662,7 @@ header button .gs {
 	gap: 16px;
 	grid-template-columns: repeat(auto-fill, 50px);
 	justify-content: space-between;
-	margin: 23px;
+	padding: 23px;
 }
 .grid li {
 	counter-increment: chapter;
@@ -678,7 +684,7 @@ header button .gs {
 #home>* .list {
 	background-color: var(--secondary-bg);
 	border-radius: 20px;
-	padding-left: 15px;
+	padding-left: 18px;
 }
 #home>* .list img {
 	background-color: var(--primary-bg);
