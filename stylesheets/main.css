@@ -168,8 +168,10 @@ body.modal #main {
 	pointer-events: none;
 	transition: filter .5s;
 }
-#modal {
+#modal-content {
+	overflow-y: auto;
 	padding: 72px 20px 20px;
+	height: 100%;
 }
 header,
 nav {
@@ -208,10 +210,12 @@ header {
 #toolbar {
 	border-radius: 15px;
 	box-shadow: 10px 10px 20px 0 var(--shadow), -10px 0 20px 0 var(--shadow);
-	overflow: hidden;
+	overflow-x: hidden;
+	overflow-y: auto;
 	position: absolute;
 	top: calc(100% + 6px);
 	right: calc(env(safe-area-inset-right) + 12px);
+	max-height: calc(100vh - 104px - 12px);
 	transform-origin: top right;
 	transition: opacity .35s, transform .4s cubic-bezier(.25, 1.25, .5, 1); /* (.25, .1, .25, 1.3) */
 }
@@ -293,9 +297,6 @@ small {
 }
 #title.swapping {
 	opacity: 0;
-}
-#modal header {
-	border-bottom: 1px solid var(--border);
 }
 ul {
 	margin: 0;
@@ -714,6 +715,12 @@ article ol:first-child {
 	counter-reset: verse;
 }
 /** Mobile **/
+@media (max-height: 600px) {
+	#modal {
+		border-radius: 0;
+		top: env(safe-area-inset-top);
+	}
+}
 @media (max-width: 400px) {
 	.tiles li {
 		width: 50%;
