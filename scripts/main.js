@@ -270,7 +270,7 @@ function closeInspector(e) {
 }
 function slide(page, tab, data, load) {
 	load = load != undefined ? load : true;
-	if (tab == "none") { // No active tab
+	if (!tab) { // No active tab
 		for (var i = 0; i < tabs.length; i++) {
 			tabs[i].classList.remove("active");
 		}
@@ -328,7 +328,7 @@ function slide(page, tab, data, load) {
 			}
 			break;
 		case "part":
-			setBack(function () { slide("book", "none", curBook, false) }, curBook.short || curBook.name);
+			setBack(function () { slide("book", null, curBook, false) }, curBook.short || curBook.name);
 			document.title = data.name || "Part";
 			swap(title, data.name || "Part", .35);
 			curPart = data;
@@ -352,9 +352,9 @@ function slide(page, tab, data, load) {
 				pLabel = "";
 			}
 			if (curPart.id == "SKIP") { // If part skipped
-				setBack(function () { slide("book", "none", curBook, false) }, pLabel);
+				setBack(function () { slide("book", null, curBook, false) }, pLabel);
 			} else {
-				setBack(function () { slide("part", "none", curPart, false) }, pLabel);
+				setBack(function () { slide("part", null, curPart, false) }, pLabel);
 			}
 			document.title = label;
 			swap(title, label || "Chapter", .35);
@@ -373,7 +373,7 @@ function slide(page, tab, data, load) {
 			}
 			setBack(function () {
 				closeInspector();
-				slide("reader", "none", curChapter, false);
+				slide("reader", null, curChapter, false);
 			}, label);
 			swap(title, data || "Inspector", .35);
 			break;
@@ -462,7 +462,7 @@ function collectionCatalog() { // Get books
 					if (success) {
 						l.textContent = book.name;
 						i.addEventListener("click", function () {
-							slide("book", "none", book, document.getElementById("parts").innerHTML == "" || bID != curBook.id); // Load parts the first time, then if different book
+							slide("book", null, book, document.getElementById("parts").innerHTML == "" || bID != curBook.id); // Load parts the first time, then if different book
 						});
 						i.appendChild(l);
 					} else {
@@ -505,11 +505,11 @@ function bookCatalog() { // Get parts
 						if (p.skip == true) {
 							item.classList.add("chapter");
 							item.addEventListener("click", function () {
-								slide("reader", "none", p);
+								slide("reader", null, p);
 							});
 						} else {
 							item.addEventListener("click", function () {
-								slide("part", "none", p, document.getElementById("chapters").innerHTML == "" || p.id != (curPart.id || "")); // Load chapters the first time, then if different part
+								slide("part", null, p, document.getElementById("chapters").innerHTML == "" || p.id != (curPart.id || "")); // Load chapters the first time, then if different part
 							});
 						}
 					})();
@@ -553,7 +553,7 @@ function partCatalog() { // Get chapters
 			(function () {
 				var c = chapter;
 				item.addEventListener("click", function () {
-					slide("reader", "none", c, document.getElementById("article").innerHTML == "" || c.id != (curChapter.id || "")); // Load article if first load of part or if different chapter
+					slide("reader", null, c, document.getElementById("article").innerHTML == "" || c.id != (curChapter.id || "")); // Load article if first load of part or if different chapter
 				});
 			})();
 			item.appendChild(label);
@@ -698,7 +698,7 @@ function note(link) {
 			break;
 		}
 	}
-	slide("inspector", "none", id);
+	slide("inspector", null, id);
 	document.getElementById("inspector-title").textContent = t;
 	var element = document.getElementById("notes");
 	while (element.firstChild) { // Clear notes
