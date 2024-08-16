@@ -70,7 +70,7 @@
 			<div>
 				<ul id="nav">
 					<li id="home-tab" class="active"><button onclick="slide('home', 'home', null, false)"><i class="gs" data-icon="house-fill"></i><span>Home</span></button></li>
-					<li id="lib-tab" ><button onclick="slide('library', 'lib', null, false)"><i class="gs" data-icon="book-fill"></i><span>Library</span></button></li>
+					<li id="lib-tab"><button id="lib-btn" onclick="slide('library', 'lib', null, false)"><i class="gs" data-icon="book-fill"></i><span>Library</span></button></li>
 				</ul>
 			</div>
 		</nav>
@@ -91,6 +91,13 @@
 			<section id="settings">Settings</section>
 		</div>
 	</aside>
+	<div id="alert">
+		<div id="alert-text">
+			<p id="alert-title"></p>
+			<p id="alert-info"></p>
+		</div>
+		<div id="alert-btns"></div>
+	</div>
 	<script src="https://cdn.jsdelivr.net/gh/CurbaiCode/gust-symbols@2.3.1/scripts/gustsymbols.min.js"></script>
 	<script src="scripts/msgpackr.min.js"></script>
 	<script src="scripts/main.js"></script>
