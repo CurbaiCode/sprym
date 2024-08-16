@@ -264,7 +264,7 @@ function setBack(action, label, hide) {
 }
 function closeInspector(e) {
 	document.getElementById("content").removeEventListener("click", closeInspector);
-	if (e && !e.target.closest("#inspector")) {
+	if (e && !e.target.closest("#inspector, header, nav")) {
 		back.click();
 	}
 }
