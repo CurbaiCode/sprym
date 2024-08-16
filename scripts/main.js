@@ -439,7 +439,7 @@ function collectionCatalog() { // Get books
 			break;
 		}
 	}
-	if (booklist) { // If found
+	if (booklist && booklist.length > 0) { // If found
 		var el = document.getElementById("books");
 		while (el.firstChild) { // Clear books
 			el.removeChild(el.lastChild);
@@ -495,7 +495,7 @@ function bookCatalog() { // Get parts
 	noteCache = null; // Clear notes
 	readBinaryFile("library/" + lang + "/" + curCollection.id + "/" + curBook.id + ".spr/book.stc", function (success, book) {
 		if (success) {
-			if (book.parts) { // If found
+			if (book.parts && book.parts.length > 0) { // If found
 				for (var part of book.parts) {
 					var item = document.createElement("li");
 					var label = document.createElement("p");
@@ -537,7 +537,7 @@ function partCatalog() { // Get chapters
 			break;
 		}
 	}
-	if (chapters) { // If found
+	if (chapters && chapters.length > 0) { // If found
 		while (el.firstChild) { // Clear chapters
 			el.removeChild(el.lastChild);
 		}
