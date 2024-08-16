@@ -262,6 +262,12 @@ function setBack(action, label, hide) {
 		back.style.opacity = "";
 	}
 }
+function closeInspector(e) {
+	document.getElementById("content").removeEventListener("click", closeInspector);
+	if (e && !e.target.closest("#inspector")) {
+		back.click();
+	}
+}
 function slide(page, tab, data, load) {
 	load = load != undefined ? load : true;
 	if (tab == "none") { // No active tab
@@ -358,11 +364,17 @@ function slide(page, tab, data, load) {
 			}
 			break;
 		case "inspector":
+			setTimeout(function () {
+				document.getElementById("content").addEventListener("click", closeInspector);
+			}, 0);
 			var label = curChapter.name;
 			if (curChapter.short) {
 				label = (curPart.short || curPart.name) + " " + curChapter.short;
 			}
-			setBack(function () { slide("reader", "none", curChapter, false) }, label);
+			setBack(function () {
+				closeInspector();
+				slide("reader", "none", curChapter, false);
+			}, label);
 			swap(title, data || "Inspector", .35);
 			break;
 		default:
@@ -751,6 +763,7 @@ function touchEnd(e, t, f) { // Functions listed [right, left, up, down]
 document.getElementById("content").addEventListener("touchstart", function (e) { touchStart(e, contentTouch) });
 document.getElementById("content").addEventListener("touchend", function (e) { touchEnd(e, contentTouch, [function (edge) {
 	if (edge || document.getElementById("reader").classList.contains("hidden")) {
+		closeInspector();
 		back.click();
 	}
 }, null])});
