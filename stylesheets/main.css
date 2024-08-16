@@ -115,7 +115,8 @@ summary { display: list-item }
 	--primary-bg: #ffffff;
 	--secondary-bg: #f2f2f7;
 	--frosted: rgba(255, 255, 255, .8);
-	--frosted-2: rgba(0, 0, 0, .08);
+	--frosted-secondary: rgba(0, 0, 0, .08);
+	--frosted-border: var(--frosted-secondary);
 	--shadow: rgba(0, 0, 0, .04);
 	--overlay: rgba(0, 0, 0, .2);
 	--dim: 0.85;
@@ -133,7 +134,8 @@ summary { display: list-item }
 	--primary-bg: #1d1d1e;
 	--secondary-bg: #3a3a3b;
 	--frosted: rgba(29, 29, 30, .8);
-	--frosted-2: rgba(0, 0, 0, .16);
+	--frosted-secondary: rgba(0, 0, 0, .16);
+	--frosted-border: rgba(255, 255, 255, .12);
 	--shadow: rgba(0, 0, 0, .08);
 	--overlay: rgba(0, 0, 0, .4);
 	--dim: 0.7;
@@ -243,13 +245,13 @@ header {
 	width: 250px;
 }
 #toolbar li:not(:first-child, hr+li) {
-	border-top: 1px solid var(--frosted-2);
+	border-top: 1px solid var(--frosted-border);
 }
 #toolbar .gs {
 	color: inherit;
 }
 #toolbar hr {
-	border: 5px solid var(--frosted-2);
+	border: 5px solid var(--frosted-secondary);
 	margin: 0;
 }
 nav {
@@ -620,7 +622,7 @@ header button .gs {
 	margin: 4px 0 0;
 }
 #alert-btns {
-	border-top: 1px solid var(--frosted-2);
+	border-top: 1px solid var(--frosted-border);
 	display: flex;
 }
 #alert-btns button {
@@ -639,7 +641,7 @@ header button .gs {
 	font-weight: 500;
 }
 #alert-btns button:not(:last-child) {
-	border-right: 1px solid var(--frosted-2);
+	border-right: 1px solid var(--frosted-border);
 }
 .tiles,
 .list,
