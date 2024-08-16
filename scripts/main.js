@@ -2,6 +2,7 @@ var lang = "eng";
 var translation = false;
 var libraryCache, collectionCache, bookCache, partCache, noteCache;
 var curCollection, curBook, curPart, curChapter;
+var contentTouch = readerTouch = modalTouch = {};
 
 function mode(b) {
 	if (b) {
@@ -712,6 +713,57 @@ function note(link) {
 // readLines("/eng/scriptures/nt.spr/matt/2.sch", [2, 3, 6, 18, 20, 21, 22], function (selection) {
 // 	console.log(selection);
 // });
+
+function touchStart(e, t) {
+	t.x = e.touches[0].clientX;
+	t.y = e.touches[0].clientY;
+}
+function touchEnd(e, t, f) { // Functions listed [right, left, up, down]
+	if (!t.x || !t.y) {
+		return;
+	}
+	var xDiff = t.x - e.changedTouches[0].clientX;
+	var yDiff = (t.y - e.changedTouches[0].clientY) * 1.25;
+	if (Math.abs(xDiff) > Math.abs(yDiff)) {
+		if (xDiff >= 10) { // Left
+			if (f[1]) {
+				f[1](t.x >= document.body.clientWidth - 25);
+			}
+		} else if (xDiff <= 10) { // Right
+			if (f[0]) {
+				f[0](t.x <= 25);
+			}
+		}
+	} else if (f.length > 2 && Math.abs(yDiff) > Math.abs(xDiff)) {
+		if (yDiff >= 10) { // Up
+			if (f[2]) {
+				f[2](t.y >= document.body.clientHeight - 25);
+			}
+		} else if (yDiff <= 10) { // Down
+			if (f[3]) {
+				f[3](t.y <= 25);
+			}
+		}
+	}
+	t.x = null;
+	t.y = null;
+}
+document.getElementById("content").addEventListener("touchstart", function (e) { touchStart(e, contentTouch) });
+document.getElementById("content").addEventListener("touchend", function (e) { touchEnd(e, contentTouch, [function (edge) {
+	if (edge || document.getElementById("reader").classList.contains("hidden")) {
+		back.click();
+	}
+}, null])});
+document.getElementById("modal").addEventListener("touchstart", function (e) {
+	if (!window.matchMedia("(max-height: 600px)").matches && (e.target.closest("#modal-header") || document.getElementById("modal-content").scrollTop <= 0)) {
+		touchStart(e, modalTouch);
+	}
+});
+document.getElementById("modal").addEventListener("touchend", function (e) {
+	if (!window.matchMedia("(max-height: 600px)").matches && (e.target.closest("#modal-header") || document.getElementById("modal-content").scrollTop <= 0)) {
+		touchEnd(e, modalTouch, [null, null, null, function () { document.body.classList.remove("modal") }]);
+	}
+});
 
 function menu(target) {
 	var el = document.getElementById(target);
