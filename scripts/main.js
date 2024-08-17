@@ -1,4 +1,4 @@
-var lang = "eng";
+var lang = "en";
 var translation = false;
 var libraryCache, collectionCache, bookCache, partCache, noteCache;
 var curCollection, curBook, curPart, curChapter;
@@ -392,7 +392,7 @@ function libCatalog() { // Get collections
 				var item = document.createElement("li");
 				var img = document.createElement("img");
 				img.loading = "lazy";
-				img.src = "library/" + lang + "/" + collection.id + "/display.jpg";
+				img.src = "library/" + collection.id + ".jpg";
 				img.addEventListener("error", function () {
 					this.src = "data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22/%3E"; // Valid empty image fallback
 				});
@@ -449,7 +449,7 @@ function collectionCatalog() { // Get books
 			var img = document.createElement("img");
 			var label = document.createElement("p");
 			img.loading = "lazy";
-			img.src = "library/" + lang + "/" + curCollection.id + "/" + bookID + ".spr/cover.jpg";
+			img.src = "library/" + lang + "/" + bookID + ".spr/cover.jpg";
 			img.addEventListener("error", function () {
 				this.src = "data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22/%3E"; // Valid empty image fallback
 			});
@@ -458,7 +458,7 @@ function collectionCatalog() { // Get books
 				var bID = bookID;
 				var i = item;
 				var l = label;
-				readBinaryFile("library/" + lang + "/" + curCollection.id + "/" + bookID + ".spr/book.stc", function (success, book) {
+				readBinaryFile("library/" + lang + "/" + bookID + ".spr/book.stc", function (success, book) {
 					if (success) {
 						l.textContent = book.name;
 						i.addEventListener("click", function () {
@@ -493,7 +493,7 @@ function bookCatalog() { // Get parts
 		article.removeChild(article.lastChild);
 	}
 	noteCache = null; // Clear notes
-	readBinaryFile("library/" + lang + "/" + curCollection.id + "/" + curBook.id + ".spr/book.stc", function (success, book) {
+	readBinaryFile("library/" + lang + "/" + curBook.id + ".spr/book.stc", function (success, book) {
 		if (success) {
 			if (book.parts && book.parts.length > 0) { // If found
 				for (var part of book.parts) {
@@ -574,7 +574,7 @@ function chapterCatalog(id) { // Get article
 	if (id == "stp") {
 		document.getElementById("head").style.display = "none";
 		(function () {
-			readBinaryFile("library/" + lang + "/" + curCollection.id + "/" + curBook.id + ".spr/book.stp", function (success, titlePage) {
+			readBinaryFile("library/" + lang + "/" + curBook.id + ".spr/book.stp", function (success, titlePage) {
 				if (success) {
 					for (var paragraph of titlePage) {
 						var p = document.createElement("p");
@@ -616,7 +616,7 @@ function chapterCatalog(id) { // Get article
 		document.getElementById("superhead").style.display = "";
 		(function () {
 			var c = curChapter;
-			readFile("library/" + lang + "/" + curCollection.id + "/" + curBook.id + ".spr/" + curChapter.id + ".sch", function (success, x) {
+			readFile("library/" + lang + "/" + curBook.id + ".spr/" + curChapter.id + ".sch", function (success, x) {
 				console.log(c, x);
 			});
 		})();
@@ -635,7 +635,7 @@ function chapterCatalog(id) { // Get article
 				document.getElementById("chapter").textContent = chapter.title || chapter.name;
 				document.getElementById("summary").textContent = chapter.summary || "";
 				(function () {
-					readFile("library/" + lang + "/" + curCollection.id + "/" + curBook.id + ".spr/" + curPart.id + "/" + curChapter.id + ".sch", function (success, contents) {
+					readFile("library/" + lang + "/" + curBook.id + ".spr/" + curPart.id + "/" + curChapter.id + ".sch", function (success, contents) {
 						if (success) {
 							var body = document.createElement("ol");
 							parse(body, "verse", contents);
@@ -710,7 +710,7 @@ function note(link) {
 		(function () {
 			var el = element;
 			var i = id;
-			readBinaryFile("library/" + lang + "/" + curCollection.id + "/" + curBook.id + ".spr/" + curPart.id + "/" + curChapter.id + ".snn", function (success, notes) {
+			readBinaryFile("library/" + lang + "/" + curBook.id + ".spr/" + curPart.id + "/" + curChapter.id + ".snn", function (success, notes) {
 				if (success) {
 					parseNote(el, notes[i]);
 					noteCache = notes;
@@ -722,7 +722,7 @@ function note(link) {
 		})();
 	}
 }
-// readLines("/eng/scriptures/nt.spr/matt/2.sch", [2, 3, 6, 18, 20, 21, 22], function (selection) {
+// readLines("/eng/nt.spr/matt/2.sch", [2, 3, 6, 18, 20, 21, 22], function (selection) {
 // 	console.log(selection);
 // });
 
