@@ -398,9 +398,15 @@ function libCatalog() { // Get collections
 				var item = document.createElement("li");
 				var img = document.createElement("img");
 				img.loading = "lazy";
-				img.src = "library/" + collection.id + ".jpg";
+				img.src = "library/" + (collection.imgLang ? lang + "/" : "") + collection.id + ".jpg";
+				img.srcset = "library/" + (collection.imgLang ? lang + "/" : "") + collection.id + "@2x.jpg 2x, library/" + (collection.imgLang ? lang + "/" : "") + collection.id + "@3x.jpg 3x";
 				img.addEventListener("error", function () {
-					this.src = "data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22/%3E"; // Valid empty image fallback
+					this.removeEventListener("error", arguments.callee);
+					this.removeAttribute("srcset");
+					this.addEventListener("error", function () {
+						this.removeEventListener("error", arguments.callee);
+						this.src = "data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22/%3E"; // Valid empty image fallback
+					});
 				});
 				var label = document.createElement("p");
 				label.textContent = collection.name;
@@ -462,8 +468,14 @@ function collectionCatalog() { // Get books
 			var label = document.createElement("p");
 			img.loading = "lazy";
 			img.src = "library/" + lang + "/" + bookID + ".spr/cover.jpg";
+			img.srcset = "library/" + lang + "/" + bookID + ".spr/cover@2x.jpg 2x, library/" + lang + "/" + bookID + ".spr/cover@3x.jpg 3x";
 			img.addEventListener("error", function () {
-				this.src = "data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22/%3E"; // Valid empty image fallback
+				this.removeEventListener("error", arguments.callee);
+				this.removeAttribute("srcset");
+				this.addEventListener("error", function () {
+					this.removeEventListener("error", arguments.callee);
+					this.src = "data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22/%3E"; // Valid empty image fallback
+				});
 			});
 			item.appendChild(img);
 			(function () {
