@@ -531,14 +531,14 @@ function bookCatalog() { // Get parts
 					label.textContent = part.name;
 					(function () {
 						var p = part;
-						if (p.skip == true) {
+						if (p.chapters) {
+							item.addEventListener("click", function () {
+								slide("part", null, p, document.getElementById("chapters").innerHTML == "" || p.id != (curPart.id || "")); // Load chapters the first time, then if different part
+							});
+						} else {
 							item.classList.add("chapter");
 							item.addEventListener("click", function () {
 								slide("reader", null, p);
-							});
-						} else {
-							item.addEventListener("click", function () {
-								slide("part", null, p, document.getElementById("chapters").innerHTML == "" || p.id != (curPart.id || "")); // Load chapters the first time, then if different part
 							});
 						}
 					})();
