@@ -267,9 +267,11 @@ function setBack(action, label, hide) {
 	}
 }
 function closeInspector(e) {
-	document.getElementById("content").removeEventListener("click", closeInspector);
-	if (e && !e.target.closest("#inspector, header, nav")) {
+	if (e && !e.target.closest("#inspector, #back")) {
+		document.getElementById("content").removeEventListener("click", closeInspector);
 		back.click();
+	} else if (!e) {
+		document.getElementById("content").removeEventListener("click", closeInspector);
 	}
 }
 function slide(page, tab, data, load) {
