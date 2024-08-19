@@ -103,7 +103,8 @@ function integer(s) {
 	return n;
 }
 function parse(el, type, text) {
-	if (type = "verse") {
+	if (type == "verse") {
+		document.getElementById("reader").classList = "verse";
 		var v = 1; // Verse number
 		for (var line of text.split(/\n(?![^\^]*\/\^)/g)) { // Preserve translation group newlines
 			if (line != "") {
@@ -214,6 +215,8 @@ function parse(el, type, text) {
 				el.appendChild(document.createElement("br"));
 			}
 		}
+	} else {
+		el.textContent = text;
 	}
 }
 

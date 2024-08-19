@@ -368,13 +368,13 @@ header li {
 article li {
 	cursor: text;
 }
-#heading,
-#subheading,
-#chapter {
+.verse #heading,
+.verse #subheading,
+.verse #chapter {
 	text-transform: uppercase;
 	text-align: center;
 }
-#heading {
+.verse #heading {
 	padding: 0 22px;
 }
 article span:not([onclick], li>li>span, .tp>span) {
