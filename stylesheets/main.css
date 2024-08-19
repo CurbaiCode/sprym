@@ -329,6 +329,7 @@ sup {
 	display: inline;
 	font-style: italic;
 	-webkit-user-select: none;
+	-moz-user-select: none;
 	-ms-user-select: none;
 	user-select: none;
 }
@@ -560,7 +561,7 @@ header button .gs {
 #back {
 	line-height: .75;
 	min-height: 34px;
-	transition: opacity .35s;
+	transition: opacity .35s, background-color .15s;
 }
 #back-label {
 	transition: opacity .175s;
@@ -744,6 +745,7 @@ header button .gs {
 }
 .grid {
 	display: grid;
+	grid-gap: 16px; /* Support */
 	gap: 16px;
 	grid-template-columns: repeat(auto-fill, 50px);
 	justify-content: space-between;
