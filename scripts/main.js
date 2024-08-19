@@ -491,6 +491,11 @@ function collectionCatalog() { // Get books
 						i.appendChild(l);
 					} else {
 						el.removeChild(i); // Remove from display
+						if (el.children.length <= 0) { // If this results in no books
+							curCollection = null;
+							back.click();
+							notify("error", "No Books Found", "No books were found in this collection.", { "OK": null });
+						}
 					}
 				});
 			})();
@@ -640,8 +645,14 @@ function chapterCatalog(id) { // Get article
 		document.getElementById("superhead").style.display = "";
 		(function () {
 			var c = curChapter;
-			readFile("library/" + lang + "/" + curBook.id + ".spr/" + curChapter.id + ".sch", function (success, x) {
-				console.log(c, x);
+			readFile("library/" + lang + "/" + curBook.id + ".spr/" + curChapter.id + ".sch", function (success, contents) {
+				if (success) {
+					var body = document.createElement("ol");
+					parse(body, c.type, contents);
+					document.getElementById("article").appendChild(body);
+				} else {
+					notify("error", "Unable to Load Chapter", "The chapter could not be loaded. Please check your network connection or try again later.", { "OK": null });
+				}
 			});
 		})();
 	} else {
@@ -659,10 +670,11 @@ function chapterCatalog(id) { // Get article
 				document.getElementById("chapter").textContent = chapter.title || chapter.name;
 				document.getElementById("summary").textContent = chapter.summary || "";
 				(function () {
+					var c = chapter;
 					readFile("library/" + lang + "/" + curBook.id + ".spr/" + curPart.id + "/" + curChapter.id + ".sch", function (success, contents) {
 						if (success) {
 							var body = document.createElement("ol");
-							parse(body, "verse", contents);
+							parse(body, c.type, contents);
 							document.getElementById("article").appendChild(body);
 						} else {
 							notify("error", "Unable to Load Chapter", "The chapter could not be loaded. Please check your network connection or try again later.", { "OK": null });
