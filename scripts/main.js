@@ -46,7 +46,11 @@ function readBinaryFile(file, callback) {
 	xhr.open("GET", file, true);
 	xhr.addEventListener("load", function () {
 		if (xhr.status >= 200 && xhr.status < 300) {
-			callback(true, msgpackr.unpack(xhr.response));
+			try {
+				callback(true, msgpackr.unpack(xhr.response));
+			} catch (e) {
+				callback(false, true);
+			}
 		} else {
 			callback(false);
 		}
@@ -411,23 +415,29 @@ function libCatalog() { // Get collections
 		} else { // Create error page
 			var err = document.createElement("div");
 			var msg = document.createElement("h2");
-			var action = document.createElement("button");
 			err.id = "error";
 			msg.textContent = "Unable to Load Library";
-			action.textContent = "Try Again";
-			action.id = "action"; // For adding click listener
-			err.append(msg, action);
+			if (!library) {
+				var action = document.createElement("button");
+				action.textContent = "Try Again";
+				action.id = "action"; // For adding click listener
+				err.append(msg, action);
+			} else {
+				err.appendChild(msg);
+			}
 			el.innerHTML = err.outerHTML;
-			document.getElementById("action").addEventListener("click", function () {
-				libCatalog();
-				slide("library", "lib");
-			});
-			setTimeout(function () {
-				document.getElementById("lib-btn").addEventListener("click", function () {
-					this.removeEventListener("click", arguments.callee);
+			if (!library) {
+				document.getElementById("action").addEventListener("click", function () {
 					libCatalog();
+					slide("library", "lib");
 				});
-			}, 0);
+				setTimeout(function () {
+					document.getElementById("lib-btn").addEventListener("click", function () {
+						this.removeEventListener("click", arguments.callee);
+						libCatalog();
+					});
+				}, 0);
+			}
 		}
 	});
 }
