@@ -833,6 +833,15 @@ function menu(target) {
 		}, 0);
 	}
 }
-function modal() {
+function modal(id) {
+	document.getElementById("modal-title").textContent = document.getElementById(id).dataset.title;
+	var m = document.getElementById("modal-content").children;
+	for (var i = 0; i < m.length; i++) {
+		if (m[i].id == id) {
+			m[i].style.display = "";
+		} else {
+			m[i].style.display = "none";
+		}
+	}
 	document.body.classList.add("modal");
 }
