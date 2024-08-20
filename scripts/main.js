@@ -39,6 +39,10 @@ if (window.matchMedia && window.matchMedia("(max-width: 400px)").matches) {
 }
 
 libCatalog();
+var reader = document.getElementById("reader");
+reader.addEventListener("scroll", function () {
+	document.getElementById("progress").style.width = (Math.min(Math.max(reader.scrollTop / (reader.scrollHeight - reader.clientHeight), 0), 1) * 100) + "%";
+});
 
 function readBinaryFile(file, callback) {
 	var xhr = new XMLHttpRequest();
@@ -48,7 +52,7 @@ function readBinaryFile(file, callback) {
 		if (xhr.status >= 200 && xhr.status < 300) {
 			try {
 				callback(true, msgpackr.unpack(xhr.response));
-			} catch (e) {
+			} catch {
 				callback(false, true);
 			}
 		} else {
@@ -279,6 +283,7 @@ function closeInspector(e) {
 }
 function slide(page, tab, data, load) {
 	load = load != undefined ? load : true;
+	document.getElementById("progress").style.opacity = "";
 	if (!tab) { // No active tab
 		for (var i = 0; i < tabs.length; i++) {
 			tabs[i].classList.remove("active");
@@ -346,6 +351,7 @@ function slide(page, tab, data, load) {
 			}
 			break;
 		case "reader":
+			document.getElementById("progress").style.opacity = "1"; // Show progress bar
 			var label = data.name;
 			var pLabel = "";
 			if (short) {
@@ -369,10 +375,13 @@ function slide(page, tab, data, load) {
 			swap(title, label || "Chapter", .35);
 			curChapter = data;
 			if (load) {
+				reader.scrollTop = 0;
+				document.getElementById("progress").style.width = ""; // Reset progress bar
 				chapterCatalog(data.id);
 			}
 			break;
 		case "inspector":
+			document.getElementById("progress").style.opacity = "1"; // Show progress bar
 			setTimeout(function () {
 				document.getElementById("content").addEventListener("click", closeInspector);
 			}, 0);
