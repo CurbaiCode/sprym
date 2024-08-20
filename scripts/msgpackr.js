@@ -25,7 +25,7 @@
 		mapsAsObjects: true
 	};
 	class C1Type {}
-	const C1 = new C1Type();
+	var C1 = new C1Type();
 	C1.name = 'MessagePack 0xC1';
 	var sequentialMode = false;
 	var inlineObjectReadThreshold = 2;
@@ -66,7 +66,7 @@
 		unpack(source, options) {
 			if (src) {
 				// re-entrant execution, save the state and restore it after we do this unpack
-				return saveState(() => {
+				return saveState(function () {
 					clearSource();
 					return this ? this.unpack(source, options) : Unpackr.prototype.unpack.call(defaultOptions, source, options)
 				})
@@ -112,11 +112,11 @@
 			return checkedRead(options)
 		}
 		unpackMultiple(source, forEach) {
-			let values, lastPosition = 0;
+			var values, lastPosition = 0;
 			try {
 				sequentialMode = true;
-				let size = source.length;
-				let value = this ? this.unpack(source, size) : defaultUnpackr.unpack(source, size);
+				var size = source.length;
+				var value = this ? this.unpack(source, size) : defaultUnpackr.unpack(source, size);
 				if (forEach) {
 					if (forEach(value, lastPosition, position$1) === false) return;
 					while(position$1 < size) {
@@ -146,9 +146,9 @@
 		_mergeStructures(loadedStructures, existingStructures) {
 			loadedStructures = loadedStructures || [];
 			if (Object.isFrozen(loadedStructures))
-				loadedStructures = loadedStructures.map(structure => structure.slice(0));
-			for (let i = 0, l = loadedStructures.length; i < l; i++) {
-				let structure = loadedStructures[i];
+				loadedStructures = loadedStructures.map(function (structure) { return structure.slice(0) });
+			for (var i = 0, l = loadedStructures.length; i < l; i++) {
+				var structure = loadedStructures[i];
 				if (structure) {
 					structure.isShared = true;
 					if (i >= 32)
@@ -156,10 +156,10 @@
 				}
 			}
 			loadedStructures.sharedLength = loadedStructures.length;
-			for (let id in existingStructures || []) {
+			for (var id in existingStructures || []) {
 				if (id >= 0) {
-					let structure = loadedStructures[id];
-					let existing = existingStructures[id];
+					var structure = loadedStructures[id];
+					var existing = existingStructures[id];
 					if (existing) {
 						if (structure)
 							(loadedStructures.restoreStructures || (loadedStructures.restoreStructures = []))[id] = structure;
@@ -176,11 +176,11 @@
 	function checkedRead(options) {
 		try {
 			if (!currentUnpackr.trusted && !sequentialMode) {
-				let sharedLength = currentStructures.sharedLength || 0;
+				var sharedLength = currentStructures.sharedLength || 0;
 				if (sharedLength < currentStructures.length)
 					currentStructures.length = sharedLength;
 			}
-			let result;
+			var result;
 			if (currentUnpackr.randomAccessStructure && src[position$1] < 0x40 && src[position$1] >= 0x20 && readStruct) {
 				result = readStruct(src, position$1, srcEnd, currentUnpackr);
 				src = null; // dispose of this so that recursive unpack calls don't save state
@@ -210,9 +210,9 @@
 				// over read
 				throw new Error('Unexpected end of MessagePack data')
 			} else if (!sequentialMode) {
-				let jsonView;
+				var jsonView;
 				try {
-					jsonView = JSON.stringify(result, (_, value) => typeof value === "bigint" ? `${value}n` : value).slice(0, 100);
+					jsonView = JSON.stringify(result, function (_, value) { return typeof value === "bigint" ? `${value}n` : value }).slice(0, 100);
 				} catch(error) {
 					jsonView = '(JSON view not available ' + error + ')';
 				}
@@ -232,20 +232,20 @@
 	}
 
 	function restoreStructures() {
-		for (let id in currentStructures.restoreStructures) {
+		for (var id in currentStructures.restoreStructures) {
 			currentStructures[id] = currentStructures.restoreStructures[id];
 		}
 		currentStructures.restoreStructures = null;
 	}
 
 	function read() {
-		let token = src[position$1++];
+		var token = src[position$1++];
 		if (token < 0xa0) {
 			if (token < 0x80) {
 				if (token < 0x40)
 					return token
 				else {
-					let structure = currentStructures[token & 0x3f] ||
+					var structure = currentStructures[token & 0x3f] ||
 						currentUnpackr.getStructures && loadStructures()[token & 0x3f];
 					if (structure) {
 						if (!structure.read) {
@@ -259,25 +259,25 @@
 				// map
 				token -= 0x80;
 				if (currentUnpackr.mapsAsObjects) {
-					let object = {};
-					for (let i = 0; i < token; i++) {
-						let key = readKey();
+					var object = {};
+					for (var i = 0; i < token; i++) {
+						var key = readKey();
 						if (key === '__proto__')
 							key = '__proto_';
 						object[key] = read();
 					}
 					return object
 				} else {
-					let map = new Map();
-					for (let i = 0; i < token; i++) {
+					var map = new Map();
+					for (var i = 0; i < token; i++) {
 						map.set(read(), read());
 					}
 					return map
 				}
 			} else {
 				token -= 0x90;
-				let array = new Array(token);
-				for (let i = 0; i < token; i++) {
+				var array = new Array(token);
+				for (var i = 0; i < token; i++) {
 					array[i] = read();
 				}
 				if (currentUnpackr.freezeData)
@@ -286,19 +286,19 @@
 			}
 		} else if (token < 0xc0) {
 			// fixstr
-			let length = token - 0xa0;
+			var length = token - 0xa0;
 			if (srcStringEnd >= position$1) {
 				return srcString.slice(position$1 - srcStringStart, (position$1 += length) - srcStringStart)
 			}
 			if (srcStringEnd == 0 && srcEnd < 140) {
 				// for small blocks, avoiding the overhead of the extract call is helpful
-				let string = length < 16 ? shortStringInJS(length) : longStringInJS(length);
+				var string = length < 16 ? shortStringInJS(length) : longStringInJS(length);
 				if (string != null)
 					return string
 			}
 			return readFixedString(length)
 		} else {
-			let value;
+			var value;
 			switch (token) {
 				case 0xc0: return null
 				case 0xc1:
@@ -345,7 +345,7 @@
 					value = dataView.getFloat32(position$1);
 					if (currentUnpackr.useFloat32 > 2) {
 						// this does rounding of numbers that were encoded in 32-bit float to nearest significant decimal digit that could be preserved
-						let multiplier = mult10[((src[position$1] & 0x7f) << 1) | (src[position$1 + 1] >> 7)];
+						var multiplier = mult10[((src[position$1] & 0x7f) << 1) | (src[position$1 + 1] >> 7)];
 						position$1 += 4;
 						return ((multiplier * value + (value > 0 ? 0.5 : -0.5)) >> 0) / multiplier
 					}
@@ -411,7 +411,7 @@
 					if (value == 0x72) {
 						return recordDefinition(src[position$1++] & 0x3f)
 					} else {
-						let extension = currentExtensions[value];
+						var extension = currentExtensions[value];
 						if (extension) {
 							if (extension.read) {
 								position$1++; // skip filler byte
@@ -488,7 +488,7 @@
 					if (token >= 0xe0)
 						return token - 0x100
 					if (token === undefined) {
-						let error = new Error('Unexpected end of MessagePack data');
+						var error = new Error('Unexpected end of MessagePack data');
 						error.incomplete = true;
 						throw error
 					}
@@ -497,20 +497,20 @@
 			}
 		}
 	}
-	const validName = /^[a-zA-Z_$][a-zA-Z\d_$]*$/;
+	var validName = /^[a-zA-Z_$][a-zA-Z\d_$]*$/;
 	function createStructureReader(structure, firstId) {
 		function readObject() {
 			// This initial function is quick to instantiate, but runs slower. After several iterations pay the cost to build the faster function
 			if (readObject.count++ > inlineObjectReadThreshold) {
-				let readObject = structure.read = (new Function('r', 'return function(){return ' + (currentUnpackr.freezeData ? 'Object.freeze' : '') +
-					'({' + structure.map(key => key === '__proto__' ? '__proto_:r()' : validName.test(key) ? key + ':r()' : ('[' + JSON.stringify(key) + ']:r()')).join(',') + '})}'))(read);
+				var readObject = structure.read = (new Function('r', 'return function(){return ' + (currentUnpackr.freezeData ? 'Object.freeze' : '') +
+					'({' + structure.map(function (key) { return key === '__proto__' ? '__proto_:r()' : validName.test(key) ? key + ':r()' : ('[' + JSON.stringify(key) + ']:r()') }).join(',') + '})}'))(read);
 				if (structure.highByte === 0)
 					structure.read = createSecondByteReader(firstId, structure.read);
 				return readObject() // second byte is already read, if there is one so immediately read object
 			}
-			let object = {};
-			for (let i = 0, l = structure.length; i < l; i++) {
-				let key = structure[i];
+			var object = {};
+			for (var i = 0, l = structure.length; i < l; i++) {
+				var key = structure[i];
 				if (key === '__proto__')
 					key = '__proto_';
 				object[key] = read();
@@ -526,13 +526,13 @@
 		return readObject
 	}
 
-	const createSecondByteReader = (firstId, read0) => {
+	var createSecondByteReader = function (firstId, read0) {
 		return function() {
-			let highByte = src[position$1++];
+			var highByte = src[position$1++];
 			if (highByte === 0)
 				return read0()
-			let id = firstId < 32 ? -(firstId + (highByte << 5)) : firstId + (highByte << 5);
-			let structure = currentStructures[id] || loadStructures()[id];
+			var id = firstId < 32 ? -(firstId + (highByte << 5)) : firstId + (highByte << 5);
+			var structure = currentStructures[id] || loadStructures()[id];
 			if (!structure) {
 				throw new Error('Record id is not defined for ' + id)
 			}
@@ -543,7 +543,7 @@
 	};
 
 	function loadStructures() {
-		let loadedStructures = saveState(() => {
+		var loadedStructures = saveState(function () {
 			// save the state in case getStructures modifies our buffer
 			src = null;
 			return currentUnpackr.getStructures()
@@ -555,38 +555,38 @@
 	var readString8 = readStringJS;
 	var readString16 = readStringJS;
 	var readString32 = readStringJS;
-	let isNativeAccelerationEnabled = false;
+	var isNativeAccelerationEnabled = false;
 	function readStringJS(length) {
-		let result;
+		var result;
 		if (length < 16) {
 			if (result = shortStringInJS(length))
 				return result
 		}
 		if (length > 64 && decoder)
 			return decoder.decode(src.subarray(position$1, position$1 += length))
-		const end = position$1 + length;
-		const units = [];
+		var end = position$1 + length;
+		var units = [];
 		result = '';
 		while (position$1 < end) {
-			const byte1 = src[position$1++];
+			var byte1 = src[position$1++];
 			if ((byte1 & 0x80) === 0) {
 				// 1 byte
 				units.push(byte1);
 			} else if ((byte1 & 0xe0) === 0xc0) {
 				// 2 bytes
-				const byte2 = src[position$1++] & 0x3f;
+				var byte2 = src[position$1++] & 0x3f;
 				units.push(((byte1 & 0x1f) << 6) | byte2);
 			} else if ((byte1 & 0xf0) === 0xe0) {
 				// 3 bytes
-				const byte2 = src[position$1++] & 0x3f;
-				const byte3 = src[position$1++] & 0x3f;
+				var byte2 = src[position$1++] & 0x3f;
+				var byte3 = src[position$1++] & 0x3f;
 				units.push(((byte1 & 0x1f) << 12) | (byte2 << 6) | byte3);
 			} else if ((byte1 & 0xf8) === 0xf0) {
 				// 4 bytes
-				const byte2 = src[position$1++] & 0x3f;
-				const byte3 = src[position$1++] & 0x3f;
-				const byte4 = src[position$1++] & 0x3f;
-				let unit = ((byte1 & 0x07) << 0x12) | (byte2 << 0x0c) | (byte3 << 0x06) | byte4;
+				var byte2 = src[position$1++] & 0x3f;
+				var byte3 = src[position$1++] & 0x3f;
+				var byte4 = src[position$1++] & 0x3f;
+				var unit = ((byte1 & 0x07) << 0x12) | (byte2 << 0x0c) | (byte3 << 0x06) | byte4;
 				if (unit > 0xffff) {
 					unit -= 0x10000;
 					units.push(((unit >>> 10) & 0x3ff) | 0xd800);
@@ -611,8 +611,8 @@
 	}
 
 	function readArray(length) {
-		let array = new Array(length);
-		for (let i = 0; i < length; i++) {
+		var array = new Array(length);
+		for (var i = 0; i < length; i++) {
 			array[i] = read();
 		}
 		if (currentUnpackr.freezeData)
@@ -622,17 +622,17 @@
 
 	function readMap(length) {
 		if (currentUnpackr.mapsAsObjects) {
-			let object = {};
-			for (let i = 0; i < length; i++) {
-				let key = readKey();
+			var object = {};
+			for (var i = 0; i < length; i++) {
+				var key = readKey();
 				if (key === '__proto__')
 					key = '__proto_';
 				object[key] = read();
 			}
 			return object
 		} else {
-			let map = new Map();
-			for (let i = 0; i < length; i++) {
+			var map = new Map();
+			for (var i = 0; i < length; i++) {
 				map.set(read(), read());
 			}
 			return map
@@ -641,10 +641,10 @@
 
 	var fromCharCode = String.fromCharCode;
 	function longStringInJS(length) {
-		let start = position$1;
-		let bytes = new Array(length);
-		for (let i = 0; i < length; i++) {
-			const byte = src[position$1++];
+		var start = position$1;
+		var bytes = new Array(length);
+		for (var i = 0; i < length; i++) {
+			var byte = src[position$1++];
 			if ((byte & 0x80) > 0) {
 					position$1 = start;
 					return
@@ -659,7 +659,7 @@
 				if (length === 0)
 					return ''
 				else {
-					let a = src[position$1++];
+					var a = src[position$1++];
 					if ((a & 0x80) > 1) {
 						position$1 -= 1;
 						return
@@ -667,15 +667,15 @@
 					return fromCharCode(a)
 				}
 			} else {
-				let a = src[position$1++];
-				let b = src[position$1++];
+				var a = src[position$1++];
+				var b = src[position$1++];
 				if ((a & 0x80) > 0 || (b & 0x80) > 0) {
 					position$1 -= 2;
 					return
 				}
 				if (length < 3)
 					return fromCharCode(a, b)
-				let c = src[position$1++];
+				var c = src[position$1++];
 				if ((c & 0x80) > 0) {
 					position$1 -= 3;
 					return
@@ -683,10 +683,10 @@
 				return fromCharCode(a, b, c)
 			}
 		} else {
-			let a = src[position$1++];
-			let b = src[position$1++];
-			let c = src[position$1++];
-			let d = src[position$1++];
+			var a = src[position$1++];
+			var b = src[position$1++];
+			var c = src[position$1++];
+			var d = src[position$1++];
 			if ((a & 0x80) > 0 || (b & 0x80) > 0 || (c & 0x80) > 0 || (d & 0x80) > 0) {
 				position$1 -= 4;
 				return
@@ -695,7 +695,7 @@
 				if (length === 4)
 					return fromCharCode(a, b, c, d)
 				else {
-					let e = src[position$1++];
+					var e = src[position$1++];
 					if ((e & 0x80) > 0) {
 						position$1 -= 5;
 						return
@@ -703,25 +703,25 @@
 					return fromCharCode(a, b, c, d, e)
 				}
 			} else if (length < 8) {
-				let e = src[position$1++];
-				let f = src[position$1++];
+				var e = src[position$1++];
+				var f = src[position$1++];
 				if ((e & 0x80) > 0 || (f & 0x80) > 0) {
 					position$1 -= 6;
 					return
 				}
 				if (length < 7)
 					return fromCharCode(a, b, c, d, e, f)
-				let g = src[position$1++];
+				var g = src[position$1++];
 				if ((g & 0x80) > 0) {
 					position$1 -= 7;
 					return
 				}
 				return fromCharCode(a, b, c, d, e, f, g)
 			} else {
-				let e = src[position$1++];
-				let f = src[position$1++];
-				let g = src[position$1++];
-				let h = src[position$1++];
+				var e = src[position$1++];
+				var f = src[position$1++];
+				var g = src[position$1++];
+				var h = src[position$1++];
 				if ((e & 0x80) > 0 || (f & 0x80) > 0 || (g & 0x80) > 0 || (h & 0x80) > 0) {
 					position$1 -= 8;
 					return
@@ -730,7 +730,7 @@
 					if (length === 8)
 						return fromCharCode(a, b, c, d, e, f, g, h)
 					else {
-						let i = src[position$1++];
+						var i = src[position$1++];
 						if ((i & 0x80) > 0) {
 							position$1 -= 9;
 							return
@@ -738,25 +738,25 @@
 						return fromCharCode(a, b, c, d, e, f, g, h, i)
 					}
 				} else if (length < 12) {
-					let i = src[position$1++];
-					let j = src[position$1++];
+					var i = src[position$1++];
+					var j = src[position$1++];
 					if ((i & 0x80) > 0 || (j & 0x80) > 0) {
 						position$1 -= 10;
 						return
 					}
 					if (length < 11)
 						return fromCharCode(a, b, c, d, e, f, g, h, i, j)
-					let k = src[position$1++];
+					var k = src[position$1++];
 					if ((k & 0x80) > 0) {
 						position$1 -= 11;
 						return
 					}
 					return fromCharCode(a, b, c, d, e, f, g, h, i, j, k)
 				} else {
-					let i = src[position$1++];
-					let j = src[position$1++];
-					let k = src[position$1++];
-					let l = src[position$1++];
+					var i = src[position$1++];
+					var j = src[position$1++];
+					var k = src[position$1++];
+					var l = src[position$1++];
 					if ((i & 0x80) > 0 || (j & 0x80) > 0 || (k & 0x80) > 0 || (l & 0x80) > 0) {
 						position$1 -= 12;
 						return
@@ -765,7 +765,7 @@
 						if (length === 12)
 							return fromCharCode(a, b, c, d, e, f, g, h, i, j, k, l)
 						else {
-							let m = src[position$1++];
+							var m = src[position$1++];
 							if ((m & 0x80) > 0) {
 								position$1 -= 13;
 								return
@@ -773,15 +773,15 @@
 							return fromCharCode(a, b, c, d, e, f, g, h, i, j, k, l, m)
 						}
 					} else {
-						let m = src[position$1++];
-						let n = src[position$1++];
+						var m = src[position$1++];
+						var n = src[position$1++];
 						if ((m & 0x80) > 0 || (n & 0x80) > 0) {
 							position$1 -= 14;
 							return
 						}
 						if (length < 15)
 							return fromCharCode(a, b, c, d, e, f, g, h, i, j, k, l, m, n)
-						let o = src[position$1++];
+						var o = src[position$1++];
 						if ((o & 0x80) > 0) {
 							position$1 -= 15;
 							return
@@ -794,8 +794,8 @@
 	}
 
 	function readOnlyJSString() {
-		let token = src[position$1++];
-		let length;
+		var token = src[position$1++];
+		var length;
 		if (token < 0xc0) {
 			// fixstr
 			length = token - 0xa0;
@@ -830,10 +830,10 @@
 			src.subarray(position$1, position$1 += length)
 	}
 	function readExt(length) {
-		let type = src[position$1++];
+		var type = src[position$1++];
 		if (currentExtensions[type]) {
-			let end;
-			return currentExtensions[type](src.subarray(position$1, end = (position$1 += length)), (readPosition) => {
+			var end;
+			return currentExtensions[type](src.subarray(position$1, end = (position$1 += length)), function (readPosition) {
 				position$1 = readPosition;
 				try {
 					return read();
@@ -848,7 +848,7 @@
 
 	var keyCache = new Array(4096);
 	function readKey() {
-		let length = src[position$1++];
+		var length = src[position$1++];
 		if (length >= 0xa0 && length < 0xc0) {
 			// fixstr, potentially use key cache
 			length = length - 0xa0;
@@ -860,12 +860,12 @@
 			position$1--;
 			return asSafeString(read())
 		}
-		let key = ((length << 5) ^ (length > 1 ? dataView.getUint16(position$1) : length > 0 ? src[position$1] : 0)) & 0xfff;
-		let entry = keyCache[key];
-		let checkPosition = position$1;
-		let end = position$1 + length - 3;
-		let chunk;
-		let i = 0;
+		var key = ((length << 5) ^ (length > 1 ? dataView.getUint16(position$1) : length > 0 ? src[position$1] : 0)) & 0xfff;
+		var entry = keyCache[key];
+		var checkPosition = position$1;
+		var end = position$1 + length - 3;
+		var chunk;
+		var i = 0;
 		if (entry && entry.bytes == length) {
 			while (checkPosition < end) {
 				chunk = dataView.getUint32(checkPosition);
@@ -904,7 +904,7 @@
 			entry.push(chunk);
 		}
 		// for small blocks, avoiding the overhead of the extract call is helpful
-		let string = length < 16 ? shortStringInJS(length) : longStringInJS(length);
+		var string = length < 16 ? shortStringInJS(length) : longStringInJS(length);
 		if (string != null)
 			return entry.string = string
 		return entry.string = readFixedString(length)
@@ -918,15 +918,15 @@
 		throw new Error('Invalid property type for record', typeof property);
 	}
 	// the registration of the record definition extension (as "r")
-	const recordDefinition = (id, highByte) => {
-		let structure = read().map(asSafeString); // ensure that all keys are strings and
+	var recordDefinition = function (id, highByte) {
+		var structure = read().map(asSafeString); // ensure that all keys are strings and
 		// that the array is mutable
-		let firstByte = id;
+		var firstByte = id;
 		if (highByte !== undefined) {
 			id = id < 32 ? -((highByte << 5) + id) : ((highByte << 5) + id);
 			structure.highByte = highByte;
 		}
-		let existingStructure = currentStructures[id];
+		var existingStructure = currentStructures[id];
 		// If it is a shared structure, we need to restore any changes after reading.
 		// Also in sequential mode, we may get incomplete reads and thus errors, and we need to restore
 		// to the state prior to an incomplete read in order to properly resume.
@@ -937,34 +937,34 @@
 		structure.read = createStructureReader(structure, firstByte);
 		return structure.read()
 	};
-	currentExtensions[0] = () => {}; // notepack defines extension 0 to mean undefined, so use that as the default here
+	currentExtensions[0] = function () {}; // notepack defines extension 0 to mean undefined, so use that as the default here
 	currentExtensions[0].noBuffer = true;
 
-	currentExtensions[0x42] = (data) => {
+	currentExtensions[0x42] = function (data) {
 		// decode bigint
-		let length = data.length;
-		let value = BigInt(data[0] & 0x80 ? data[0] - 0x100 : data[0]);
-		for (let i = 1; i < length; i++) {
-			value <<= 8n;
+		var length = data.length;
+		var value = BigInt(data[0] & 0x80 ? data[0] - 0x100 : data[0]);
+		for (var i = 1; i < length; i++) {
+			value <<= BigInt(8);
 			value += BigInt(data[i]);
 		}
 		return value;
 	};
 
-	let errors = { Error, TypeError, ReferenceError };
-	currentExtensions[0x65] = () => {
-		let data = read();
+	var errors = { Error, TypeError, ReferenceError };
+	currentExtensions[0x65] = function () {
+		var data = read();
 		return (errors[data[0]] || Error)(data[1], { cause: data[2] })
 	};
 
-	currentExtensions[0x69] = (data) => {
+	currentExtensions[0x69] = function (data) {
 		// id extension (for structured clones)
 		if (currentUnpackr.structuredClone === false) throw new Error('Structured clone extension is disabled')
-		let id = dataView.getUint32(position$1 - 4);
+		var id = dataView.getUint32(position$1 - 4);
 		if (!referenceMap)
 			referenceMap = new Map();
-		let token = src[position$1];
-		let target;
+		var token = src[position$1];
+		var target;
 		// TODO: handle Maps, Sets, and other types that can cycle; this is complicated, because you potentially need to read
 		// ahead past references to record structure definitions
 		if (token >= 0x90 && token < 0xa0 || token == 0xdc || token == 0xdd)
@@ -972,36 +972,36 @@
 		else
 			target = {};
 
-		let refEntry = { target }; // a placeholder object
+		var refEntry = { target }; // a placeholder object
 		referenceMap.set(id, refEntry);
-		let targetProperties = read(); // read the next value as the target object to id
+		var targetProperties = read(); // read the next value as the target object to id
 		if (refEntry.used) // there is a cycle, so we have to assign properties to original target
 			return Object.assign(target, targetProperties)
 		refEntry.target = targetProperties; // the placeholder wasn't used, replace with the deserialized one
 		return targetProperties // no cycle, can just use the returned read object
 	};
 
-	currentExtensions[0x70] = (data) => {
+	currentExtensions[0x70] = function (data) {
 		// pointer extension (for structured clones)
 		if (currentUnpackr.structuredClone === false) throw new Error('Structured clone extension is disabled')
-		let id = dataView.getUint32(position$1 - 4);
-		let refEntry = referenceMap.get(id);
+		var id = dataView.getUint32(position$1 - 4);
+		var refEntry = referenceMap.get(id);
 		refEntry.used = true;
 		return refEntry.target
 	};
 
-	currentExtensions[0x73] = () => new Set(read());
+	currentExtensions[0x73] = function () { new Set(read()) };
 
-	const typedArrays = ['Int8','Uint8','Uint8Clamped','Int16','Uint16','Int32','Uint32','Float32','Float64','BigInt64','BigUint64'].map(type => type + 'Array');
+	var typedArrays = ['Int8', 'Uint8', 'Uint8Clamped', 'Int16', 'Uint16', 'Int32', 'Uint32', 'Float32', 'Float64', 'BigInt64', 'BigUint64'].map(function (type) { return type + 'Array' });
 
-	let glbl = typeof globalThis === 'object' ? globalThis : window;
-	currentExtensions[0x74] = (data) => {
-		let typeCode = data[0];
-		let typedArrayName = typedArrays[typeCode];
+	var glbl = typeof globalThis === 'object' ? globalThis : window;
+	currentExtensions[0x74] = function (data) {
+		var typeCode = data[0];
+		var typedArrayName = typedArrays[typeCode];
 		if (!typedArrayName) {
 			if (typeCode === 16) {
-				let ab = new ArrayBuffer(data.length - 1);
-				let u8 = new Uint8Array(ab);
+				var ab = new ArrayBuffer(data.length - 1);
+				var u8 = new Uint8Array(ab);
 				u8.set(data.subarray(1));
 				return ab;
 			}
@@ -1010,14 +1010,14 @@
 		// we have to always slice/copy here to get a new ArrayBuffer that is word/byte aligned
 		return new glbl[typedArrayName](Uint8Array.prototype.slice.call(data, 1).buffer)
 	};
-	currentExtensions[0x78] = () => {
-		let data = read();
+	currentExtensions[0x78] = function () {
+		var data = read();
 		return new RegExp(data[0], data[1])
 	};
-	const TEMP_BUNDLE = [];
-	currentExtensions[0x62] = (data) => {
-		let dataSize = (data[0] << 24) + (data[1] << 16) + (data[2] << 8) + data[3];
-		let dataPosition = position$1;
+	var TEMP_BUNDLE = [];
+	currentExtensions[0x62] = function (data) {
+		var dataSize = (data[0] << 24) + (data[1] << 16) + (data[2] << 8) + data[3];
+		var dataPosition = position$1;
 		position$1 += dataSize - data.length;
 		bundledStrings$1 = TEMP_BUNDLE;
 		bundledStrings$1 = [readOnlyJSString(), readOnlyJSString()];
@@ -1028,7 +1028,7 @@
 		return read()
 	};
 
-	currentExtensions[0xff] = (data) => {
+	currentExtensions[0xff] = function (data) {
 		// 32-bit date extension
 		if (data.length == 4)
 			return new Date((data[0] * 0x1000000 + (data[1] << 16) + (data[2] << 8) + data[3]) * 1000)
@@ -1047,21 +1047,21 @@
 	// currentExtensions[0x52] = () =>
 
 	function saveState(callback) {
-		let savedSrcEnd = srcEnd;
-		let savedPosition = position$1;
-		let savedSrcStringStart = srcStringStart;
-		let savedSrcStringEnd = srcStringEnd;
-		let savedSrcString = srcString;
-		let savedReferenceMap = referenceMap;
-		let savedBundledStrings = bundledStrings$1;
+		var savedSrcEnd = srcEnd;
+		var savedPosition = position$1;
+		var savedSrcStringStart = srcStringStart;
+		var savedSrcStringEnd = srcStringEnd;
+		var savedSrcString = srcString;
+		var savedReferenceMap = referenceMap;
+		var savedBundledStrings = bundledStrings$1;
 
 		// TODO: We may need to revisit this if we do more external calls to user code (since it could be slow)
-		let savedSrc = new Uint8Array(src.slice(0, srcEnd)); // we copy the data in case it changes while external data is processed
-		let savedStructures = currentStructures;
-		let savedStructuresContents = currentStructures.slice(0, currentStructures.length);
-		let savedPackr = currentUnpackr;
-		let savedSequentialMode = sequentialMode;
-		let value = callback();
+		var savedSrc = new Uint8Array(src.slice(0, srcEnd)); // we copy the data in case it changes while external data is processed
+		var savedStructures = currentStructures;
+		var savedStructuresContents = currentStructures.slice(0, currentStructures.length);
+		var savedPackr = currentUnpackr;
+		var savedSequentialMode = sequentialMode;
+		var value = callback();
 		srcEnd = savedSrcEnd;
 		position$1 = savedPosition;
 		srcStringStart = savedSrcStringStart;
@@ -1072,7 +1072,9 @@
 		src = savedSrc;
 		sequentialMode = savedSequentialMode;
 		currentStructures = savedStructures;
-		currentStructures.splice(0, currentStructures.length, ...savedStructuresContents);
+		for (var ssc of savedStructuresContents) {
+			currentStructures.splice(0, currentStructures.length, ssc);
+		}
 		currentUnpackr = savedPackr;
 		dataView = new DataView(src.buffer, src.byteOffset, src.byteLength);
 		return value
@@ -1090,69 +1092,69 @@
 			currentExtensions[extension.type] = extension;
 	}
 
-	const mult10 = new Array(147); // this is a table matching binary exponents to the multiplier to determine significant digit rounding
-	for (let i = 0; i < 256; i++) {
+	var mult10 = new Array(147); // this is a table matching binary exponents to the multiplier to determine significant digit rounding
+	for (var i = 0; i < 256; i++) {
 		mult10[i] = +('1e' + Math.floor(45.15 - i * 0.30103));
 	}
-	const Decoder = Unpackr;
+	var Decoder = Unpackr;
 	var defaultUnpackr = new Unpackr({ useRecords: false });
-	const unpack = defaultUnpackr.unpack;
-	const unpackMultiple = defaultUnpackr.unpackMultiple;
-	const decode = defaultUnpackr.unpack;
-	const FLOAT32_OPTIONS = {
+	var unpack = defaultUnpackr.unpack;
+	var unpackMultiple = defaultUnpackr.unpackMultiple;
+	var decode = defaultUnpackr.unpack;
+	var FLOAT32_OPTIONS = {
 		NEVER: 0,
 		ALWAYS: 1,
 		DECIMAL_ROUND: 3,
 		DECIMAL_FIT: 4
 	};
-	let f32Array = new Float32Array(1);
-	let u8Array = new Uint8Array(f32Array.buffer, 0, 4);
+	var f32Array = new Float32Array(1);
+	var u8Array = new Uint8Array(f32Array.buffer, 0, 4);
 	function roundFloat32(float32Number) {
 		f32Array[0] = float32Number;
-		let multiplier = mult10[((u8Array[3] & 0x7f) << 1) | (u8Array[2] >> 7)];
+		var multiplier = mult10[((u8Array[3] & 0x7f) << 1) | (u8Array[2] >> 7)];
 		return ((multiplier * float32Number + (float32Number > 0 ? 0.5 : -0.5)) >> 0) / multiplier
 	}
 
-	let textEncoder;
+	var textEncoder;
 	try {
 		textEncoder = new TextEncoder();
 	} catch (error) {}
-	let extensions, extensionClasses;
-	const hasNodeBuffer = typeof Buffer !== 'undefined';
-	const ByteArrayAllocate = hasNodeBuffer ?
+	var extensions, extensionClasses;
+	var hasNodeBuffer = typeof Buffer !== 'undefined';
+	var ByteArrayAllocate = hasNodeBuffer ?
 		function(length) { return Buffer.allocUnsafeSlow(length) } : Uint8Array;
-	const ByteArray = hasNodeBuffer ? Buffer : Uint8Array;
-	const MAX_BUFFER_SIZE = hasNodeBuffer ? 0x100000000 : 0x7fd00000;
-	let target, keysTarget;
-	let targetView;
-	let position = 0;
-	let safeEnd;
-	let bundledStrings = null;
-	let writeStructSlots;
-	const MAX_BUNDLE_SIZE = 0x5500; // maximum characters such that the encoded bytes fits in 16 bits.
-	const hasNonLatin = /[\u0080-\uFFFF]/;
-	const RECORD_SYMBOL = Symbol('record-id');
+	var ByteArray = hasNodeBuffer ? Buffer : Uint8Array;
+	var MAX_BUFFER_SIZE = hasNodeBuffer ? 0x100000000 : 0x7fd00000;
+	var target, keysTarget;
+	var targetView;
+	var position = 0;
+	var safeEnd;
+	var bundledStrings = null;
+	var writeStructSlots;
+	var MAX_BUNDLE_SIZE = 0x5500; // maximum characters such that the encoded bytes fits in 16 bits.
+	var hasNonLatin = /[\u0080-\uFFFF]/;
+	var RECORD_SYMBOL = Symbol('record-id');
 	class Packr extends Unpackr {
 		constructor(options) {
 			super(options);
 			this.offset = 0;
-			let start;
-			let hasSharedUpdate;
-			let structures;
-			let referenceMap;
-			let encodeUtf8 = ByteArray.prototype.utf8Write ? function(string, position) {
+			var start;
+			var hasSharedUpdate;
+			var structures;
+			var referenceMap;
+			var encodeUtf8 = ByteArray.prototype.utf8Write ? function(string, position) {
 				return target.utf8Write(string, position, 0xffffffff)
 			} : (textEncoder && textEncoder.encodeInto) ?
 				function(string, position) {
 					return textEncoder.encodeInto(string, target.subarray(position)).written
 				} : false;
 
-			let packr = this;
+			var packr = this;
 			if (!options)
 				options = {};
-			let isSequential = options && options.sequential;
-			let hasSharedStructures = options.structures || options.saveStructures;
-			let maxSharedStructures = options.maxSharedStructures;
+			var isSequential = options && options.sequential;
+			var hasSharedStructures = options.structures || options.saveStructures;
+			var maxSharedStructures = options.maxSharedStructures;
 			if (maxSharedStructures == null)
 				maxSharedStructures = hasSharedStructures ? 32 : 0;
 			if (maxSharedStructures > 8160)
@@ -1160,21 +1162,21 @@
 			if (options.structuredClone && options.moreTypes == undefined) {
 				this.moreTypes = true;
 			}
-			let maxOwnStructures = options.maxOwnStructures;
+			var maxOwnStructures = options.maxOwnStructures;
 			if (maxOwnStructures == null)
 				maxOwnStructures = hasSharedStructures ? 32 : 64;
 			if (!this.structures && options.useRecords != false)
 				this.structures = [];
 			// two byte record ids for shared structures
-			let useTwoByteRecords = maxSharedStructures > 32 || (maxOwnStructures + maxSharedStructures > 64);
-			let sharedLimitId = maxSharedStructures + 0x40;
-			let maxStructureId = maxSharedStructures + maxOwnStructures + 0x40;
+			var useTwoByteRecords = maxSharedStructures > 32 || (maxOwnStructures + maxSharedStructures > 64);
+			var sharedLimitId = maxSharedStructures + 0x40;
+			var maxStructureId = maxSharedStructures + maxOwnStructures + 0x40;
 			if (maxStructureId > 8256) {
 				throw new Error('Maximum maxSharedStructure + maxOwnStructure is 8192')
 			}
-			let recordIdsToRemove = [];
-			let transitionsCount = 0;
-			let serializationsSinceTransitionRebuild = 0;
+			var recordIdsToRemove = [];
+			var transitionsCount = 0;
+			var serializationsSinceTransitionRebuild = 0;
 
 			this.pack = this.encode = function(value, encodeOptions) {
 				if (!target) {
@@ -1203,7 +1205,7 @@
 				if (structures) {
 					if (structures.uninitialized)
 						structures = packr._mergeStructures(packr.getStructures());
-					let sharedLength = structures.sharedLength || 0;
+					var sharedLength = structures.sharedLength || 0;
 					if (sharedLength > maxSharedStructures) {
 						//if (maxSharedStructures <= 32 && structures.sharedLength > 32) // TODO: could support this, but would need to update the limit ids
 						throw new Error('Shared structures is larger than maximum shared structures, try increasing maxSharedStructures to ' + structures.sharedLength)
@@ -1211,13 +1213,13 @@
 					if (!structures.transitions) {
 						// rebuild our structure transitions
 						structures.transitions = Object.create(null);
-						for (let i = 0; i < sharedLength; i++) {
-							let keys = structures[i];
+						for (var i = 0; i < sharedLength; i++) {
+							var keys = structures[i];
 							if (!keys)
 								continue
-							let nextTransition, transition = structures.transitions;
-							for (let j = 0, l = keys.length; j < l; j++) {
-								let key = keys[j];
+							var nextTransition, transition = structures.transitions;
+							for (var j = 0, l = keys.length; j < l; j++) {
+								var key = keys[j];
 								nextTransition = transition[key];
 								if (!nextTransition) {
 									nextTransition = transition[key] = Object.create(null);
@@ -1234,21 +1236,21 @@
 				}
 				if (hasSharedUpdate)
 					hasSharedUpdate = false;
-				let encodingError;
+				var encodingError;
 				try {
 					if (packr.randomAccessStructure && value && value.constructor && value.constructor === Object)
 						writeStruct(value);
 					else
 						pack(value);
-					let lastBundle = bundledStrings;
+					var lastBundle = bundledStrings;
 					if (bundledStrings)
 						writeBundles(start, pack, 0);
 					if (referenceMap && referenceMap.idsToInsert) {
-						let idsToInsert = referenceMap.idsToInsert.sort((a, b) => a.offset > b.offset ? 1 : -1);
-						let i = idsToInsert.length;
-						let incrementPosition = -1;
+						var idsToInsert = referenceMap.idsToInsert.sort(function (a, b) { a.offset > b.offset ? 1 : -1 });
+						var i = idsToInsert.length;
+						var incrementPosition = -1;
 						while (lastBundle && i > 0) {
-							let insertionPoint = idsToInsert[--i].offset + start;
+							var insertionPoint = idsToInsert[--i].offset + start;
 							if (insertionPoint < (lastBundle.stringsPosition + start) && incrementPosition === -1)
 								incrementPosition = 0;
 							if (insertionPoint > (lastBundle.position + start)) {
@@ -1274,7 +1276,7 @@
 						if (position > safeEnd)
 							makeRoom(position);
 						packr.offset = position;
-						let serialized = insertIds(target.subarray(start, position), idsToInsert);
+						var serialized = insertIds(target.subarray(start, position), idsToInsert);
 						referenceMap = null;
 						return serialized
 					}
@@ -1292,10 +1294,10 @@
 					if (structures) {
 						resetStructures();
 						if (hasSharedUpdate && packr.saveStructures) {
-							let sharedLength = structures.sharedLength || 0;
+							var sharedLength = structures.sharedLength || 0;
 							// we can't rely on start/end with REUSE_BUFFER_MODE since they will (probably) change when we save
-							let returnBuffer = target.subarray(start, position);
-							let newSharedData = prepareStructures(structures, packr);
+							var returnBuffer = target.subarray(start, position);
+							var newSharedData = prepareStructures(structures, packr);
 							if (!encodingError) { // TODO: If there is an encoding error, should make the structures as uninitialized so they get rebuilt next time
 								if (packr.saveStructures(newSharedData, newSharedData.isCompatible) === false) {
 									// get updated structures and try again if the update failed
@@ -1314,10 +1316,10 @@
 						position = start;
 				}
 			};
-			const resetStructures = () => {
+			var resetStructures = function () {
 				if (serializationsSinceTransitionRebuild < 10)
 					serializationsSinceTransitionRebuild++;
-				let sharedLength = structures.sharedLength || 0;
+				var sharedLength = structures.sharedLength || 0;
 				if (structures.length > sharedLength && !isSequential)
 					structures.length = sharedLength;
 				if (transitionsCount > 10000) {
@@ -1328,13 +1330,13 @@
 					if (recordIdsToRemove.length > 0)
 						recordIdsToRemove = [];
 				} else if (recordIdsToRemove.length > 0 && !isSequential) {
-					for (let i = 0, l = recordIdsToRemove.length; i < l; i++) {
+					for (var i = 0, l = recordIdsToRemove.length; i < l; i++) {
 						recordIdsToRemove[i][RECORD_SYMBOL] = 0;
 					}
 					recordIdsToRemove = [];
 				}
 			};
-			const packArray = (value) => {
+			var packArray = function (value) {
 				var length = value.length;
 				if (length < 0x10) {
 					target[position++] = 0x90 | length;
@@ -1347,25 +1349,25 @@
 					targetView.setUint32(position, length);
 					position += 4;
 				}
-				for (let i = 0; i < length; i++) {
+				for (var i = 0; i < length; i++) {
 					pack(value[i]);
 				}
 			};
-			const pack = (value) => {
+			var pack = function (value) {
 				if (position > safeEnd)
 					target = makeRoom(position);
 
 				var type = typeof value;
 				var length;
 				if (type === 'string') {
-					let strLength = value.length;
+					var strLength = value.length;
 					if (bundledStrings && strLength >= 4 && strLength < 0x1000) {
 						if ((bundledStrings.size += strLength) > MAX_BUNDLE_SIZE) {
-							let extStart;
-							let maxBytes = (bundledStrings[0] ? bundledStrings[0].length * 3 + bundledStrings[1].length : 0) + 10;
+							var extStart;
+							var maxBytes = (bundledStrings[0] ? bundledStrings[0].length * 3 + bundledStrings[1].length : 0) + 10;
 							if (position + maxBytes > safeEnd)
 								target = makeRoom(position + maxBytes);
-							let lastBundle;
+							var lastBundle;
 							if (bundledStrings.position) { // here we use the 0x62 extension to write the last bundle and reserve space for the reference pointer to the next/current bundle
 								lastBundle = bundledStrings;
 								target[position] = 0xc8; // ext 16
@@ -1386,13 +1388,13 @@
 							bundledStrings.size = 0;
 							bundledStrings.position = extStart;
 						}
-						let twoByte = hasNonLatin.test(value);
+						var twoByte = hasNonLatin.test(value);
 						bundledStrings[twoByte ? 0 : 1] += value;
 						target[position++] = 0xc1;
 						pack(twoByte ? -strLength : strLength);
 						return
 					}
-					let headerSize;
+					var headerSize;
 					// first we estimate the header size, so we can write to the correct location
 					if (strLength < 0x20) {
 						headerSize = 1;
@@ -1403,12 +1405,12 @@
 					} else {
 						headerSize = 5;
 					}
-					let maxBytes = strLength * 3;
+					var maxBytes = strLength * 3;
 					if (position + maxBytes > safeEnd)
 						target = makeRoom(position + maxBytes);
 
 					if (strLength < 0x40 || !encodeUtf8) {
-						let i, c1, c2, strPosition = position + headerSize;
+						var i, c1, c2, strPosition = position + headerSize;
 						for (i = 0; i < strLength; i++) {
 							c1 = value.charCodeAt(i);
 							if (c1 < 0x80) {
@@ -1494,11 +1496,11 @@
 							position += 4;
 						}
 					} else {
-						let useFloat32;
+						var useFloat32;
 						if ((useFloat32 = this.useFloat32) > 0 && value < 0x100000000 && value >= -0x80000000) {
 							target[position++] = 0xca;
 							targetView.setFloat32(position, value);
-							let xShifted;
+							var xShifted;
 							if (useFloat32 < 4 ||
 									// this checks for rounding of numbers that were encoded in 32-bit float to nearest significant decimal digit that could be preserved
 									((xShifted = value * mult10[((target[position] & 0x7f) << 1) | (target[position + 1] >> 7)]) >> 0) === xShifted) {
@@ -1516,10 +1518,10 @@
 						target[position++] = 0xc0;
 					else {
 						if (referenceMap) {
-							let referee = referenceMap.get(value);
+							var referee = referenceMap.get(value);
 							if (referee) {
 								if (!referee.id) {
-									let idsToInsert = referenceMap.idsToInsert || (referenceMap.idsToInsert = []);
+									var idsToInsert = referenceMap.idsToInsert || (referenceMap.idsToInsert = []);
 									referee.id = idsToInsert.push(referee);
 								}
 								target[position++] = 0xd6; // fixext 4
@@ -1530,7 +1532,7 @@
 							} else
 								referenceMap.set(value, { offset: position - start });
 						}
-						let constructor = value.constructor;
+						var constructor = value.constructor;
 						if (constructor === Object) {
 							writeObject(value);
 						} else if (constructor === Array) {
@@ -1550,23 +1552,23 @@
 									targetView.setUint32(position, length);
 									position += 4;
 								}
-								for (let [key, entryValue] of value) {
+								for (var [key, entryValue] of value) {
 									pack(key);
 									pack(entryValue);
 								}
 							}
 						} else {
-							for (let i = 0, l = extensions.length; i < l; i++) {
-								let extensionClass = extensionClasses[i];
+							for (var i = 0, l = extensions.length; i < l; i++) {
+								var extensionClass = extensionClasses[i];
 								if (value instanceof extensionClass) {
-									let extension = extensions[i];
+									var extension = extensions[i];
 									if (extension.write) {
 										if (extension.type) {
 											target[position++] = 0xd4; // one byte "tag" extension
 											target[position++] = extension.type;
 											target[position++] = 0;
 										}
-										let writeResult = extension.write.call(this, value);
+										var writeResult = extension.write.call(this, value);
 										if (writeResult === value) { // avoid infinite recursion
 											if (Array.isArray(value)) {
 												packArray(value);
@@ -1578,13 +1580,13 @@
 										}
 										return
 									}
-									let currentTarget = target;
-									let currentTargetView = targetView;
-									let currentPosition = position;
+									var currentTarget = target;
+									var currentTargetView = targetView;
+									var currentPosition = position;
 									target = null;
-									let result;
+									var result;
 									try {
-										result = extension.pack.call(this, value, (size) => {
+										result = extension.pack.call(this, value, function (size) {
 											// restore target and use it
 											target = currentTarget;
 											currentTarget = null;
@@ -1618,7 +1620,7 @@
 							} else {
 								// use this as an alternate mechanism for expressing how to serialize
 								if (value.toJSON) {
-									const json = value.toJSON();
+									var json = value.toJSON();
 									// if for some reason value.toJSON returns itself it'll loop forever
 									if (json !== value)
 										return pack(json)
@@ -1649,23 +1651,23 @@
 						if (this.largeBigIntToFloat) {
 							target[position++] = 0xcb;
 							targetView.setFloat64(position, Number(value));
-						} else if (this.useBigIntExtension && value < 2n**(1023n) && value > -(2n**(1023n))) {
+						/*} else if (this.useBigIntExtension && value < BigInt(2)**BigInt(1023) && value > -(BigInt(2)**BigInt(1023))) {
 							target[position++] = 0xc7;
 							position++;
 							target[position++] = 0x42; // "B" for BigInt
-							let bytes = [];
-							let alignedSign;
+							var bytes = [];
+							var alignedSign;
 							do {
-								let byte = value & 0xffn;
-								alignedSign = (byte & 0x80n) === (value < 0n ? 0x80n : 0n);
+								var byte = value & BigInt(0xff);
+								alignedSign = (byte & BigInt(0x80)) === (value < BigInt(0) ? BigInt(0x80) : BigInt(0));
 								bytes.push(byte);
-								value >>= 8n;
-							} while (!((value === 0n || value === -1n) && alignedSign));
+								value >>= BigInt(8);
+							} while (!((value === BigInt(0) || value === -BigInt(1)) && alignedSign));
 							target[position-2] = bytes.length;
-							for (let i = bytes.length; i > 0;) {
+							for (var i = bytes.length; i > 0;) {
 								target[position++] = Number(bytes[--i]);
 							}
-							return
+							return*/
 						} else {
 							throw new RangeError(value + ' was too large to fit in MessagePack 64-bit integer format, use' +
 								' useBigIntExtension or set largeBigIntToFloat to convert to float-64')
@@ -1685,12 +1687,12 @@
 				}
 			};
 
-			const writePlainObject = (this.variableMapSize || this.coercibleKeyAsNumber || this.skipValues) ? (object) => {
+			var writePlainObject = (this.variableMapSize || this.coercibleKeyAsNumber || this.skipValues) ? function (object) {
 				// this method is slightly slower, but generates "preferred serialization" (optimally small for smaller objects)
-				let keys;
+				var keys;
 				if (this.skipValues) {
 					keys = [];
-					for (let key in object) {
+					for (var key in object) {
 						if ((typeof object.hasOwnProperty !== 'function' || object.hasOwnProperty(key)) &&
 							!this.skipValues.includes(object[key]))
 							keys.push(key);
@@ -1698,7 +1700,7 @@
 				} else {
 					keys = Object.keys(object);
 				}
-				let length = keys.length;
+				var length = keys.length;
 				if (length < 0x10) {
 					target[position++] = 0x80 | length;
 				} else if (length < 0x10000) {
@@ -1710,28 +1712,28 @@
 					targetView.setUint32(position, length);
 					position += 4;
 				}
-				let key;
+				var key;
 				if (this.coercibleKeyAsNumber) {
-					for (let i = 0; i < length; i++) {
+					for (var i = 0; i < length; i++) {
 						key = keys[i];
-						let num = Number(key);
+						var num = Number(key);
 						pack(isNaN(num) ? key : num);
 						pack(object[key]);
 					}
 
 				} else {
-					for (let i = 0; i < length; i++) {
+					for (var i = 0; i < length; i++) {
 						pack(key = keys[i]);
 						pack(object[key]);
 					}
 				}
 			} :
-			(object) => {
+			function (object) {
 				target[position++] = 0xde; // always using map 16, so we can preallocate and set the length afterwards
-				let objectOffset = position - start;
+				var objectOffset = position - start;
 				position += 2;
-				let size = 0;
-				for (let key in object) {
+				var size = 0;
+				for (var key in object) {
 					if (typeof object.hasOwnProperty !== 'function' || object.hasOwnProperty(key)) {
 						pack(key);
 						pack(object[key]);
@@ -1742,25 +1744,25 @@
 				target[objectOffset + start] = size & 0xff;
 			};
 
-			const writeRecord = this.useRecords === false ? writePlainObject :
+			var writeRecord = this.useRecords === false ? writePlainObject :
 			(options.progressiveRecords && !useTwoByteRecords) ?  // this is about 2% faster for highly stable structures, since it only requires one for-in loop (but much more expensive when new structure needs to be written)
-			(object) => {
-				let nextTransition, transition = structures.transitions || (structures.transitions = Object.create(null));
-				let objectOffset = position++ - start;
-				let wroteKeys;
-				for (let key in object) {
+			function (object) {
+				var nextTransition, transition = structures.transitions || (structures.transitions = Object.create(null));
+				var objectOffset = position++ - start;
+				var wroteKeys;
+				for (var key in object) {
 					if (typeof object.hasOwnProperty !== 'function' || object.hasOwnProperty(key)) {
 						nextTransition = transition[key];
 						if (nextTransition)
 							transition = nextTransition;
 						else {
 							// record doesn't exist, create full new record and insert it
-							let keys = Object.keys(object);
-							let lastTransition = transition;
+							var keys = Object.keys(object);
+							var lastTransition = transition;
 							transition = structures.transitions;
-							let newTransitions = 0;
-							for (let i = 0, l = keys.length; i < l; i++) {
-								let key = keys[i];
+							var newTransitions = 0;
+							for (var i = 0, l = keys.length; i < l; i++) {
+								var key = keys[i];
 								nextTransition = transition[key];
 								if (!nextTransition) {
 									nextTransition = transition[key] = Object.create(null);
@@ -1781,17 +1783,17 @@
 					}
 				}
 				if (!wroteKeys) {
-					let recordId = transition[RECORD_SYMBOL];
+					var recordId = transition[RECORD_SYMBOL];
 					if (recordId)
 						target[objectOffset + start] = recordId;
 					else
 						insertNewRecord(transition, Object.keys(object), objectOffset, 0);
 				}
 			} :
-			(object) => {
-				let nextTransition, transition = structures.transitions || (structures.transitions = Object.create(null));
-				let newTransitions = 0;
-				for (let key in object) if (typeof object.hasOwnProperty !== 'function' || object.hasOwnProperty(key)) {
+			function (object) {
+				var nextTransition, transition = structures.transitions || (structures.transitions = Object.create(null));
+				var newTransitions = 0;
+				for (var key in object) if (typeof object.hasOwnProperty !== 'function' || object.hasOwnProperty(key)) {
 					nextTransition = transition[key];
 					if (!nextTransition) {
 						nextTransition = transition[key] = Object.create(null);
@@ -1799,7 +1801,7 @@
 					}
 					transition = nextTransition;
 				}
-				let recordId = transition[RECORD_SYMBOL];
+				var recordId = transition[RECORD_SYMBOL];
 				if (recordId) {
 					if (recordId >= 0x60 && useTwoByteRecords) {
 						target[position++] = ((recordId -= 0x60) & 0x1f) + 0x60;
@@ -1810,21 +1812,21 @@
 					newRecord(transition, transition.__keys__ || Object.keys(object), newTransitions);
 				}
 				// now write the values
-				for (let key in object)
+				for (var key in object)
 					if (typeof object.hasOwnProperty !== 'function' || object.hasOwnProperty(key)) {
 						pack(object[key]);
 					}
 			};
 
 			// create reference to useRecords if useRecords is a function
-			const checkUseRecords = typeof this.useRecords == 'function' && this.useRecords;
+			var checkUseRecords = typeof this.useRecords == 'function' && this.useRecords;
 
-			const writeObject = checkUseRecords ? (object) => {
+			var writeObject = checkUseRecords ? function (object) {
 				checkUseRecords(object) ? writeRecord(object) : writePlainObject(object);
 			} : writeRecord;
 
-			const makeRoom = (end) => {
-				let newSize;
+			var makeRoom = function (end) {
+				var newSize;
 				if (end > 0x1000000) {
 					// special handling for really large buffers
 					if ((end - start) > MAX_BUFFER_SIZE)
@@ -1833,7 +1835,7 @@
 						Math.round(Math.max((end - start) * (end > 0x4000000 ? 1.25 : 2), 0x400000) / 0x1000) * 0x1000);
 				} else // faster handling for smaller buffers
 					newSize = ((Math.max((end - start) << 2, target.length - 1) >> 12) + 1) << 12;
-				let newBuffer = new ByteArrayAllocate(newSize);
+				var newBuffer = new ByteArrayAllocate(newSize);
 				targetView = newBuffer.dataView || (newBuffer.dataView = new DataView(newBuffer.buffer, 0, newSize));
 				end = Math.min(end, target.length);
 				if (target.copy)
@@ -1845,8 +1847,8 @@
 				safeEnd = newBuffer.length - 10;
 				return target = newBuffer
 			};
-			const newRecord = (transition, keys, newTransitions) => {
-				let recordId = structures.nextId;
+			var newRecord = function (transition, keys, newTransitions) {
+				var recordId = structures.nextId;
 				if (!recordId)
 					recordId = 0x40;
 				if (recordId < sharedLimitId && this.shouldShareStructure && !this.shouldShareStructure(keys)) {
@@ -1859,7 +1861,7 @@
 						recordId = sharedLimitId;
 					structures.nextId = recordId + 1;
 				}
-				let highByte = keys.highByte = recordId >= 0x60 && useTwoByteRecords ? (recordId - 0x60) >> 5 : -1;
+				var highByte = keys.highByte = recordId >= 0x60 && useTwoByteRecords ? (recordId - 0x60) >> 5 : -1;
 				transition[RECORD_SYMBOL] = recordId;
 				transition.__keys__ = keys;
 				structures[recordId - 0x40] = keys;
@@ -1895,11 +1897,11 @@
 					pack(keys);
 				}
 			};
-			const insertNewRecord = (transition, keys, insertionOffset, newTransitions) => {
-				let mainTarget = target;
-				let mainPosition = position;
-				let mainSafeEnd = safeEnd;
-				let mainStart = start;
+			var insertNewRecord = function (transition, keys, insertionOffset, newTransitions) {
+				var mainTarget = target;
+				var mainPosition = position;
+				var mainSafeEnd = safeEnd;
+				var mainStart = start;
 				target = keysTarget;
 				position = 0;
 				start = 0;
@@ -1908,16 +1910,16 @@
 				safeEnd = target.length - 10;
 				newRecord(transition, keys, newTransitions);
 				keysTarget = target;
-				let keysPosition = position;
+				var keysPosition = position;
 				target = mainTarget;
 				position = mainPosition;
 				safeEnd = mainSafeEnd;
 				start = mainStart;
 				if (keysPosition > 1) {
-					let newEnd = position + keysPosition - 1;
+					var newEnd = position + keysPosition - 1;
 					if (newEnd > safeEnd)
 						makeRoom(newEnd);
-					let insertionPosition = insertionOffset + start;
+					var insertionPosition = insertionOffset + start;
 					target.copyWithin(insertionPosition + keysPosition, insertionPosition + 1, position);
 					target.set(keysTarget.slice(0, keysPosition), insertionPosition);
 					position = newEnd;
@@ -1925,12 +1927,12 @@
 					target[insertionOffset + start] = keysTarget[0];
 				}
 			};
-			const writeStruct = (object) => {
-				let newPosition = writeStructSlots(object, target, start, position, structures, makeRoom, (value, newPosition, notifySharedUpdate) => {
+			var writeStruct = function (object) {
+				var newPosition = writeStructSlots(object, target, start, position, structures, makeRoom, function (value, newPosition, notifySharedUpdate) {
 					if (notifySharedUpdate)
 						return hasSharedUpdate = true;
 					position = newPosition;
-					let startTarget = target;
+					var startTarget = target;
 					pack(value);
 					resetStructures();
 					if (startTarget !== target) {
@@ -1966,16 +1968,16 @@
 	extensionClasses = [ Date, Set, Error, RegExp, ArrayBuffer, Object.getPrototypeOf(Uint8Array.prototype).constructor /*TypedArray*/, C1Type ];
 	extensions = [{
 		pack(date, allocateForWrite, pack) {
-			let seconds = date.getTime() / 1000;
+			var seconds = date.getTime() / 1000;
 			if ((this.useTimestamp32 || date.getMilliseconds() === 0) && seconds >= 0 && seconds < 0x100000000) {
 				// Timestamp 32
-				let { target, targetView, position} = allocateForWrite(6);
+				var { target, targetView, position} = allocateForWrite(6);
 				target[position++] = 0xd6;
 				target[position++] = 0xff;
 				targetView.setUint32(position, seconds);
 			} else if (seconds > 0 && seconds < 0x100000000) {
 				// Timestamp 64
-				let { target, targetView, position} = allocateForWrite(10);
+				var { target, targetView, position} = allocateForWrite(10);
 				target[position++] = 0xd7;
 				target[position++] = 0xff;
 				targetView.setUint32(position, date.getMilliseconds() * 4000000 + ((seconds / 1000 / 0x100000000) >> 0));
@@ -1986,13 +1988,13 @@
 					return pack(this.onInvalidDate())
 				}
 				// Intentionally invalid timestamp
-				let { target, targetView, position} = allocateForWrite(3);
+				var { target, targetView, position} = allocateForWrite(3);
 				target[position++] = 0xd4;
 				target[position++] = 0xff;
 				target[position++] = 0xff;
 			} else {
 				// Timestamp 96
-				let { target, targetView, position} = allocateForWrite(15);
+				var { target, targetView, position} = allocateForWrite(15);
 				target[position++] = 0xc7;
 				target[position++] = 12;
 				target[position++] = 0xff;
@@ -2006,8 +2008,8 @@
 				allocateForWrite(0);
 				return pack({})
 			}
-			let array = Array.from(set);
-			let { target, position} = allocateForWrite(this.moreTypes ? 3 : 0);
+			var array = Array.from(set);
+			var { target, position} = allocateForWrite(this.moreTypes ? 3 : 0);
 			if (this.moreTypes) {
 				target[position++] = 0xd4;
 				target[position++] = 0x73; // 's' for Set
@@ -2017,7 +2019,7 @@
 		}
 	}, {
 		pack(error, allocateForWrite, pack) {
-			let { target, position} = allocateForWrite(this.moreTypes ? 3 : 0);
+			var { target, position} = allocateForWrite(this.moreTypes ? 3 : 0);
 			if (this.moreTypes) {
 				target[position++] = 0xd4;
 				target[position++] = 0x65; // 'e' for error
@@ -2027,7 +2029,7 @@
 		}
 	}, {
 		pack(regex, allocateForWrite, pack) {
-			let { target, position} = allocateForWrite(this.moreTypes ? 3 : 0);
+			var { target, position} = allocateForWrite(this.moreTypes ? 3 : 0);
 			if (this.moreTypes) {
 				target[position++] = 0xd4;
 				target[position++] = 0x78; // 'x' for regeXp
@@ -2044,7 +2046,7 @@
 		}
 	}, {
 		pack(typedArray, allocateForWrite) {
-			let constructor = typedArray.constructor;
+			var constructor = typedArray.constructor;
 			if (constructor !== ByteArray && this.moreTypes)
 				writeExtBuffer(typedArray, typedArrays.indexOf(constructor.name), allocateForWrite);
 			else
@@ -2052,13 +2054,13 @@
 		}
 	}, {
 		pack(c1, allocateForWrite) { // specific 0xC1 object
-			let { target, position} = allocateForWrite(1);
+			var { target, position} = allocateForWrite(1);
 			target[position] = 0xc1;
 		}
 	}];
 
 	function writeExtBuffer(typedArray, type, allocateForWrite, encode) {
-		let length = typedArray.byteLength;
+		var length = typedArray.byteLength;
 		if (length + 1 < 0x100) {
 			var { target, position } = allocateForWrite(4 + length);
 			target[position++] = 0xc7;
@@ -2080,7 +2082,7 @@
 		target.set(new Uint8Array(typedArray.buffer, typedArray.byteOffset, typedArray.byteLength), position);
 	}
 	function writeBuffer(buffer, allocateForWrite) {
-		let length = buffer.byteLength;
+		var length = buffer.byteLength;
 		var target, position;
 		if (length < 0x100) {
 			var { target, position } = allocateForWrite(length + 2);
@@ -2101,7 +2103,7 @@
 	}
 
 	function writeExtensionData(result, target, position, type) {
-		let length = result.length;
+		var length = result.length;
 		switch (length) {
 			case 1:
 				target[position++] = 0xd4;
@@ -2142,15 +2144,15 @@
 
 	function insertIds(serialized, idsToInsert) {
 		// insert the ids that need to be referenced for structured clones
-		let nextId;
-		let distanceToMove = idsToInsert.length * 6;
-		let lastEnd = serialized.length - distanceToMove;
+		var nextId;
+		var distanceToMove = idsToInsert.length * 6;
+		var lastEnd = serialized.length - distanceToMove;
 		while (nextId = idsToInsert.pop()) {
-			let offset = nextId.offset;
-			let id = nextId.id;
+			var offset = nextId.offset;
+			var id = nextId.id;
 			serialized.copyWithin(offset + distanceToMove, offset, lastEnd);
 			distanceToMove -= 6;
-			let position = offset + distanceToMove;
+			var position = offset + distanceToMove;
 			serialized[position++] = 0xd6;
 			serialized[position++] = 0x69; // 'i'
 			serialized[position++] = id >> 24;
@@ -2166,7 +2168,7 @@
 		if (bundledStrings.length > 0) {
 			targetView.setUint32(bundledStrings.position + start, position + incrementPosition - bundledStrings.position - start);
 			bundledStrings.stringsPosition = position - start;
-			let writeStrings = bundledStrings;
+			var writeStrings = bundledStrings;
 			bundledStrings = null;
 			pack(writeStrings[0]);
 			pack(writeStrings[1]);
@@ -2185,8 +2187,8 @@
 		addExtension$1(extension);
 	}
 	function prepareStructures(structures, packr) {
-		structures.isCompatible = (existingStructures) => {
-			let compatible = !existingStructures || ((packr.lastNamedStructuresLength || 0) === existingStructures.length);
+		structures.isCompatible = function (existingStructures) {
+			var compatible = !existingStructures || ((packr.lastNamedStructuresLength || 0) === existingStructures.length);
 			if (!compatible) // we want to merge these existing structures immediately since we already have it and we are in the right transaction
 				packr._mergeStructures(existingStructures);
 			return compatible;
@@ -2194,14 +2196,14 @@
 		return structures
 	}
 
-	let defaultPackr = new Packr({ useRecords: false });
-	const pack = defaultPackr.pack;
-	const encode = defaultPackr.pack;
-	const Encoder = Packr;
-	const { NEVER, ALWAYS, DECIMAL_ROUND, DECIMAL_FIT } = FLOAT32_OPTIONS;
-	const REUSE_BUFFER_MODE = 512;
-	const RESET_BUFFER_MODE = 1024;
-	const RESERVE_START_SPACE = 2048;
+	var defaultPackr = new Packr({ useRecords: false });
+	var pack = defaultPackr.pack;
+	var encode = defaultPackr.pack;
+	var Encoder = Packr;
+	var { NEVER, ALWAYS, DECIMAL_ROUND, DECIMAL_FIT } = FLOAT32_OPTIONS;
+	var REUSE_BUFFER_MODE = 512;
+	var RESET_BUFFER_MODE = 1024;
+	var RESERVE_START_SPACE = 2048;
 
 	/**
 	 * Given an Iterable first argument, returns an Iterable where each value is packed as a Buffer
@@ -2210,7 +2212,8 @@
 	 * @param {options} [options] - msgpackr pack options
 	 * @returns {IterableIterator|Promise.<AsyncIterableIterator>}
 	 */
-	function packIter (objectIterator, options = {}) {
+	function packIter (objectIterator, options) {
+	  options = options != undefined ? options : {};
 	  if (!objectIterator || typeof objectIterator !== 'object') {
 	    throw new Error('first argument must be an Iterable, Async Iterable, or a Promise for an Async Iterable')
 	  } else if (typeof objectIterator[Symbol.iterator] === 'function') {
@@ -2222,18 +2225,38 @@
 	  }
 	}
 
-	function * packIterSync (objectIterator, options) {
-	  const packr = new Packr(options);
-	  for (const value of objectIterator) {
-	    yield packr.pack(value);
-	  }
+	function packIterSync (objectIterator, options) {
+      var packr = new Packr(options);
+      var iterator = objectIteratorSymbol.iterator;
+      return {
+        next: function() {
+          return iterator.next().then(function(result) {
+            if (result.done) {
+              return { done: true };
+            }
+            return packr.pack(result.value).then(function(packedValue) {
+              return { value: packedValue, done: false };
+            });
+          });
+        }
+      };
 	}
 
-	async function * packIterAsync (objectIterator, options) {
-	  const packr = new Packr(options);
-	  for await (const value of objectIterator) {
-	    yield packr.pack(value);
-	  }
+	function packIterAsync(objectIterator, options) {
+	  var packr = new Packr(options);
+	  var iterator = objectIteratorSymbol.asyncIterator;
+	  return {
+	    next: function() {
+	      return iterator.next().then(function(result) {
+	        if (result.done) {
+	          return { done: true };
+	        }
+	        return packr.pack(result.value).then(function(packedValue) {
+	          return { value: packedValue, done: false };
+	        });
+	      });
+	    }
+	  };
 	}
 
 	/**
@@ -2243,15 +2266,16 @@
 	 * @param {object} [options] - unpackr options
 	 * @returns {IterableIterator|Promise.<AsyncIterableIterator}
 	 */
-	function unpackIter (bufferIterator, options = {}) {
+	function unpackIter (bufferIterator, options) {
+	  options = options != undefined ? options : {};
 	  if (!bufferIterator || typeof bufferIterator !== 'object') {
 	    throw new Error('first argument must be an Iterable, Async Iterable, Iterator, Async Iterator, or a promise')
 	  }
 
-	  const unpackr = new Unpackr(options);
-	  let incomplete;
-	  const parser = (chunk) => {
-	    let yields;
+	  var unpackr = new Unpackr(options);
+	  var incomplete;
+	  var parser = function (chunk) {
+	    var yields;
 	    // if there's incomplete data from previous chunk, concatinate and try again
 	    if (incomplete) {
 	      chunk = Buffer.concat([incomplete, chunk]);
@@ -2272,24 +2296,44 @@
 	  };
 
 	  if (typeof bufferIterator[Symbol.iterator] === 'function') {
-	    return (function * iter () {
-	      for (const value of bufferIterator) {
-	        yield * parser(value);
-	      }
-	    })()
+        return (function iter() {
+          var iterator = symbol.iterator;
+          return {
+            next: function() {
+              return iterator.next().then(function(result) {
+                if (result.done) {
+                  return { done: true };
+                }
+                return parser(result.value).then(function(parser) {
+                  return { value: parser, done: false };
+                });
+              });
+            }
+          };
+        })()
 	  } else if (typeof bufferIterator[Symbol.asyncIterator] === 'function') {
-	    return (async function * iter () {
-	      for await (const value of bufferIterator) {
-	        yield * parser(value);
-	      }
+	    return (function iter() {
+	      var iterator = symbol.asyncIterator;
+	      return {
+	        next: function() {
+	          return iterator.next().then(function(result) {
+	            if (result.done) {
+	              return { done: true };
+	            }
+	            return parser(result.value).then(function(parser) {
+	              return { value: parser, done: false };
+	            });
+	          });
+	        }
+	      };
 	    })()
 	  }
 	}
-	const decodeIter = unpackIter;
-	const encodeIter = packIter;
+	var decodeIter = unpackIter;
+	var encodeIter = packIter;
 
-	const useRecords = false;
-	const mapsAsObjects = true;
+	var useRecords = false;
+	var mapsAsObjects = true;
 
 	exports.ALWAYS = ALWAYS;
 	exports.C1 = C1;
@@ -2319,4 +2363,3 @@
 	exports.useRecords = useRecords;
 
 }));
-//# sourceMappingURL=index.js.map

@@ -419,7 +419,8 @@ function libCatalog() { // Get collections
 						slide("collection", "lib", c, document.getElementById("books").innerHTML == "" || (curCollection && c.id != curCollection.id)); // Load books the first time, then if different collection
 					});
 				})();
-				item.append(img, label);
+				item.appendChild(img);
+				item.appendChild(label);
 				el.appendChild(item);
 			}
 			libraryCache = library;
@@ -432,7 +433,8 @@ function libCatalog() { // Get collections
 				var action = document.createElement("button");
 				action.textContent = "Try Again";
 				action.id = "action"; // For adding click listener
-				err.append(msg, action);
+				err.appendChild(msg);
+				err.appendChild(action);
 			} else {
 				err.appendChild(msg);
 			}
@@ -531,7 +533,18 @@ function bookCatalog() { // Get parts
 				for (var part of book.parts) {
 					var item = document.createElement("li");
 					var label = document.createElement("p");
-					label.textContent = part.name;
+					var tc = document.createTextNode(part.name);
+					if (part.before) {
+						var before = document.createElement("span");
+						before.textContent = part.before;
+						label.appendChild(before);
+					}
+					label.appendChild(tc);
+					if (part.after) {
+						var after = document.createElement("span");
+						after.textContent = part.after;
+						label.appendChild(after);
+					}
 					(function () {
 						var p = part;
 						if (p.chapters) {
@@ -581,7 +594,18 @@ function partCatalog() { // Get chapters
 		for (var chapter of chapters) {
 			var item = document.createElement("li");
 			var label = document.createElement("p");
-			label.textContent = chapter.name;
+			var tc = document.createTextNode(chapter.name);
+			if (chapter.before) {
+				var before = document.createElement("span");
+				before.textContent = chapter.before;
+				label.appendChild(before);
+			}
+			label.appendChild(tc);
+			if (chapter.after) {
+				var after = document.createElement("span");
+				after.textContent = chapter.after;
+				label.appendChild(after);
+			}
 			(function () {
 				var c = chapter;
 				item.addEventListener("click", function () {
@@ -731,9 +755,10 @@ function parseNote(el, note) {
 function note(link) {
 	var id = link.id.slice(1);
 	var t = "";
-	for (var child of link.childNodes) { // Search for title label
-		if (child.nodeType == Node.TEXT_NODE) {
-			t = child.nodeValue;
+	var cn = link.childNodes;
+	for (var i = 0; i < cn.length; i++) { // Search for title label
+		if (cn[i].nodeType == Node.TEXT_NODE) {
+			t = cn[i].nodeValue;
 			break;
 		}
 	}
