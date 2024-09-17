@@ -149,7 +149,7 @@ function parse(el, type, text) {
 							t = newSubline.split("~")[1];
 							var translationLen = t.split("\n").length;
 						}
-						while (emMatch = /`([^\|]+?)`/g.exec(t)) { // Emphasize ` `, but not `| `
+						while (emMatch = /`([^\|]+?)`[^\|]/g.exec(t)) { // Emphasize ` `, but not `| `
 							t = t.replace(emMatch[0], '<em class="jst">' + emMatch[1] + "</em>");
 						}
 						var first = true;
@@ -674,6 +674,8 @@ function chapterCatalog(id) { // Get article
 			});
 		})();
 	} else if (curPart.id == "SKIP") {
+		document.getElementById("chapter").style.display = "none";
+		document.getElementById("summary").style.display = "none";
 		document.getElementById("head").style.display = "";
 		document.getElementById("heading").textContent = curChapter.title || curChapter.name;
 		document.getElementById("subheading").textContent = curChapter.subtitle || "";
@@ -695,7 +697,7 @@ function chapterCatalog(id) { // Get article
 		document.getElementById("head").style.display = "";
 		for (var chapter of partCache) { // Search for selected chapter
 			if (chapter.id == curChapter.id) {
-				if (chapter == partCache[0]) { // Populate heading above first chapter
+				if (chapter.first == true) { // Populate heading above first chapter
 					document.getElementById("heading").textContent = curPart.title || "";
 					document.getElementById("subheading").textContent = curPart.subtitle || "";
 					document.getElementById("intro").textContent = curPart.intro || "";
@@ -703,8 +705,10 @@ function chapterCatalog(id) { // Get article
 				} else {
 					document.getElementById("superhead").style.display = "none";
 				}
+				document.getElementById("chapter").style.display = "";
+				document.getElementById("summary").style.display = "";
 				document.getElementById("chapter").textContent = chapter.title || chapter.name;
-				document.getElementById("summary").textContent = chapter.summary || "";
+				document.getElementById("summary-text").textContent = chapter.summary || "";
 				(function () {
 					var c = chapter;
 					readFile("library/" + lang + "/" + curBook.id + ".spr/" + curPart.id + "/" + curChapter.id + ".sch", function (success, contents) {
