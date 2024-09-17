@@ -414,7 +414,7 @@ main>* {
 	height: 100%;
 	overflow-x: hidden;
 	overflow-y: scroll;
-	transition: right .35s;
+	transition: transform .35s;
 }
 main>section>* {
 	margin: 0 auto;
@@ -465,14 +465,14 @@ main>*:not(#inspector)::after {
 	z-index: 7;
 }
 main>*:not(.hidden)+* {
-	right: -100%;
+	transform: translateX(100%);
 }
 main>.hidden {
 	pointer-events: none;
-	right: 25%;
+	transform: translateX(-25%);
 }
 #reader.hidden {
-	right: 0;
+	transform: none;
 }
 main>.hidden::after {
 	background-color: var(--overlay) !important;
@@ -539,11 +539,11 @@ nav {
 	right: env(safe-area-inset-right);
 	bottom: 0;
 	z-index: 99999;
-	transition: top .5s cubic-bezier(0.22, 1, 0.36, 1); /* easeOutQuint */
+	transition: transform .5s cubic-bezier(.22, 1, .36, 1); /* easeOutQuint */
 }
 #modal:not(.modal #modal) {
-	top: 100%;
-	transition: top .35s;
+	transform: translateY(100%);
+	transition: transform .35s;
 }
 /** UI Elements **/
 button {
@@ -632,7 +632,7 @@ header button .gs {
 	opacity: 0;
 	pointer-events: none;
 	transform: translate(-50%, -50%) scale(1.25);
-	transition: opacity .25s, transform 0s ease .5s;
+	transition: opacity .25s, transform 0s .375s;
 }
 #alert-text {
 	line-height: 1.3;
