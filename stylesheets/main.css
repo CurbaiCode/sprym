@@ -108,7 +108,7 @@ summary { display: list-item }
 	--reader-text: 21px;
 	--accent: #d17750;
 	--accent-accessible: #ab4d2e;
-	--note: #0071a4;
+	--link: #0071a4;
 	--text: #000000;
 	--secondary-text: #8e8e93;
 	--border: #d1d1d6;
@@ -119,7 +119,7 @@ summary { display: list-item }
 	--frosted-border: var(--frosted-secondary);
 	--shadow: rgba(0, 0, 0, .04);
 	--overlay: rgba(0, 0, 0, .2);
-	--dim: 0.85;
+	--dim: .85;
 	--active: rgba(0, 0, 0, .08);
 	--inactive: rgba(0, 0, 0, .4);
 	--hover: rgba(0, 0, 0, .05);
@@ -128,7 +128,7 @@ summary { display: list-item }
 [data-theme=dark] {
 	--accent: #d67e59;
 	--accent-accessible: #da8a68;
-	--note: #70d7e1;
+	--link: #70d7e1;
 	--text: #ffffff;
 	--border: #636366;
 	--primary-bg: #1d1d1e;
@@ -138,7 +138,7 @@ summary { display: list-item }
 	--frosted-border: rgba(255, 255, 255, .12);
 	--shadow: rgba(0, 0, 0, .08);
 	--overlay: rgba(0, 0, 0, .4);
-	--dim: 0.7;
+	--dim: .7;
 	--active: rgba(255, 255, 255, .08);
 	--inactive: rgba(255, 255, 255, .4);
 	--hover: rgba(255, 255, 255, .05);
@@ -213,7 +213,7 @@ header {
 	transition: opacity .35s;
 }
 .open+.menu button .gs {
-	opacity: 0.5;
+	opacity: .5;
 	transition: opacity .15s;
 }
 #toolbar,
@@ -809,7 +809,7 @@ header button .gs {
 }
 /** Settings **/
 article span[onclick] {
-	color: var(--note);
+	color: var(--link);
 	cursor: pointer;
 }
 #article {
