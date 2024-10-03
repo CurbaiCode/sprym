@@ -52,6 +52,7 @@
 			<section id="reader">
 				<div id="head">
 					<div id="superhead" style="display:none">
+						<p id="supheading"></>
 						<h2 id="heading"></h2>
 						<h4 id="subheading"></h4>
 						<p id="intro"></p>
@@ -72,16 +73,19 @@
 				<ul id="nav">
 					<li id="home-tab" class="active"><button onclick="slide('home', 'home', null, false)"><i class="gs" data-icon="house-fill"></i><span>Home</span></button></li>
 					<li id="lib-tab"><button id="lib-btn" onclick="slide('library', 'lib', null, false)"><i class="gs" data-icon="book-fill"></i><span>Library</span></button></li>
+					<li id="search-tab"><button onclick="modal('search')"><i class="gs" data-icon="magnifyingglass"></i><span>Search</span></button></li>
 				</ul>
 			</div>
 		</nav>
 	</div>
 	<aside id="modal">
-		<header>
+		<header id="modal-header">
 			<div>
-				<ul class="head-left"></ul>
+				<ul class="head-left">
+					<li><button onclick="document.body.classList.remove('modal')">Cancel</button></li>
+				</ul>
 				<div class="head-center">
-					<h1 id="modal-title">Modal</h1>
+					<h1 id="modal-title"></h1>
 				</div>
 				<ul class="head-right">
 					<li><button onclick="document.body.classList.remove('modal')">Done</button></li>
@@ -89,7 +93,15 @@
 			</div>
 		</header>
 		<div id="modal-content">
-			<section id="settings" data-title="Settings"></section>
+			<section id="settings" data-title="Settings">
+				<ul class="list">
+					<li><div class="img"><i class="gs" style="color:var(--accent)">shield-lefthalf</i></div><p>Font<span class="right"><input type="checkbox" id="switch-font"/><label for="switch-font"></label></span></p></li>
+					<li><div class="img"><i class="gs" style="color:var(--accent)">doc-text-fill</i></div><p>Versed<span class="right"><input type="checkbox" id="switch-versed" checked/><label for="switch-versed"></label></span></p></li>
+					<li><div class="img"><i class="gs" style="color:var(--accent)">magnifyingglass</i></div><p>Clarity<span class="right"><input type="checkbox" id="switch-clarity" checked/><label for="switch-clarity"></label></span></p></li>
+					<li><div class="img"><i class="gs" style="color:var(--accent)">book-fill</i></div><p>Revisions<span class="right"><input type="checkbox" id="switch-revisions"/><label for="switch-revisions"></label></span></p></li>
+				</ul>
+			</section>
+			<section id="search" data-title="Search"></section>
 		</div>
 	</aside>
 	<div id="alert">

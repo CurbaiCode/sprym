@@ -1,5 +1,5 @@
 var lang = "en";
-var translation = false;
+var revision = true;
 var libraryCache, collectionCache, bookCache, partCache, noteCache;
 var curCollection, curBook, curPart, curChapter;
 var contentTouch = readerTouch = modalTouch = {};
@@ -42,6 +42,17 @@ libCatalog();
 var reader = document.getElementById("reader");
 reader.addEventListener("scroll", function () {
 	document.getElementById("progress").style.width = (Math.min(Math.max(reader.scrollTop / (reader.scrollHeight - reader.clientHeight), 0), 1) * 100) + "%";
+});
+document.getElementById("switch-font").addEventListener("change", function () {
+	reader.classList.toggle("font", document.getElementById("switch-font").checked);
+	document.getElementById("inspector").classList.toggle("font", document.getElementById("switch-font").checked);
+});
+document.getElementById("switch-versed").addEventListener("change", function () {
+	reader.classList.toggle("paragraph", !document.getElementById("switch-versed").checked);
+});
+document.getElementById("switch-clarity").addEventListener("change", function () {
+	reader.classList.toggle("clarity", document.getElementById("switch-clarity").checked);
+	document.getElementById("inspector").classList.toggle("clarity", document.getElementById("switch-clarity").checked);
 });
 
 function readBinaryFile(file, callback) {
@@ -107,10 +118,14 @@ function integer(s) {
 	return n;
 }
 function parse(el, type, text) {
+	reader.classList.remove("verse", "manual");
+	reader.classList.toggle("font", document.getElementById("switch-font").checked);
+	reader.classList.toggle("paragraph", !document.getElementById("switch-versed").checked);
+	reader.classList.toggle("clarity", document.getElementById("switch-clarity").checked);
 	if (type == "verse") {
-		document.getElementById("reader").classList = "verse";
+		reader.classList.add("verse");
 		var v = 1; // Verse number
-		for (var line of text.split(/\n(?![^\^]*\/\^)/g)) { // Preserve translation group newlines
+		for (var line of text.split(/\n(?![^\^]*\/\^)/g)) { // Preserve revision group newlines
 			if (line != "") {
 				var item = document.createElement("li");
 				item.id = "p" + v;
@@ -122,11 +137,11 @@ function parse(el, type, text) {
 				while (match = /(?:<([^>]+)>)|(?:\^([^\^]+)\/\^)/g.exec(line)) { // Either < > or ^ /^
 					var ord = ordinal(n);
 					var sup = "<sup>" + ord + "</sup>";
-					if (match[2]) { // Translation
+					if (match[2]) { // Revision
 						var subCount = 0; // Contained notes
 						var newSubline = match[2];
 						while (submatch = /<([^>]+)>/g.exec(match[2])) { // Mini verse Parse()
-							if (match[2].split("~")[0].startsWith("<")) { // Special Case: If translation begins with a note, then combine notes to avoid superimposition
+							if (match[2].split("~")[0].startsWith("<")) { // Special Case: If revision begins with a note, then combine notes to avoid superimposition
 								newSubline = newSubline.replace(submatch[0], submatch[1]);
 								match[2] = match[2].replace(submatch[0], "");
 							}
@@ -145,9 +160,9 @@ function parse(el, type, text) {
 						sup = "<sup>" + ord + "</sup>";
 						var t = newSubline.split("~")[0];
 						var originalLen = t.split("\n").length;
-						if (translation) {
+						if (document.getElementById("switch-revisions").checked) {
 							t = newSubline.split("~")[1];
-							var translationLen = t.split("\n").length;
+							var revisionLen = t.split("\n").length;
 						}
 						while (emMatch = /`([^\|]+?)`[^\|]/g.exec(t)) { // Emphasize ` `, but not `| `
 							t = t.replace(emMatch[0], '<em class="jst">' + emMatch[1] + "</em>");
@@ -189,7 +204,7 @@ function parse(el, type, text) {
 						}
 						ord = ordinal(n);
 						sup = "<sup>" + ord + "</sup>";
-						if (translation) {
+						if (document.getElementById("switch-revisions").checked) {
 							newLine = newLine.replace(match[0], '<span id="n' + v + ord + '">' + sup + t + "</span>");
 						} else {
 							t = t.split(/ (?![^<]*>)/g); // Preserve HTML tags
@@ -200,8 +215,8 @@ function parse(el, type, text) {
 						n = n + subCount; // Add contained notes
 						item.id = "p" + v; // I don't know why this works
 						v = v + u - 1; // Reset verse number for following verses
-						if (translation) {
-							v = v - (translationLen - originalLen);
+						if (document.getElementById("switch-revisions").checked) {
+							v = v - (revisionLen - originalLen);
 						}
 					} else {
 						newLine = newLine.replace(match[0], '<span id="n' + v + ord + '" onclick="note(this)">' + sup + match[1] + "</span>");
@@ -218,6 +233,140 @@ function parse(el, type, text) {
 			} else {
 				el.appendChild(document.createElement("br"));
 			}
+		}
+	} else if (type == "manual") {
+		reader.classList.add("manual");
+		for (var group of text.split("\n\n")) {
+			var newGroup = group;
+			while (match = /<(.*?)>/.exec(newGroup)) {
+				newGroup = newGroup.replace(match[0], "");
+				group = group.replace(match[0], '<span onclick="">' + match[1] + "</span>");
+			}
+			group = group.replaceAll(/^\s*\*\*\*\s*$/g, "<hr>").replaceAll(/^\s*---\s*$/g, "<hr>").replaceAll(/^\s*===\s*$/g, "<hr>");
+			while (match = /`(.*?)`/g.exec(group)) {
+				group = group.replace(match[0], "<em>" + match[1] + "</em>");
+			}
+			while (match = /\*(.*?)\*/g.exec(group)) {
+				group = group.replace(match[0], "<strong>" + match[1] + "</strong>");
+			}
+			var hLevel = 0;
+			var parent = document.createElement("li");
+			if (group.startsWith("@")) {
+				hLevel = parseInt(group.charAt(1));
+				group = group.replace(/@[1-4]\s*/, "");
+			} else if (group.startsWith("|")) {
+				parent.classList.add("info-box");
+				var ib = document.createElement("h4");
+				ib.innerHTML = group.split("\n")[0].slice(1);
+				parent.appendChild(ib);
+				group = group.replace(/\|.*?\n/, "");
+			}
+			if (group.startsWith("!")) {
+				parent.classList.add("figure");
+				group = group.replace(/!/, "").split(/\n/g);
+				var img = document.createElement("img");
+				img.loading = "lazy";
+				img.src = "library/" + lang + "/" + curBook.id + ".spr/book.img/" + curChapter.id + "/" + group[0].split("!")[0];
+				img.alt = group[0].split("!")[1] || group[1];
+				parent.appendChild(img);
+				if (group[1]) {
+					var caption = document.createElement("p");
+					caption.innerHTML = group[1];
+					parent.appendChild(caption);
+				}
+			} else if (group.startsWith("?")) {
+				parent.classList.add("quote");
+				group = group.replace(/\?/, "").split(/\n/g);
+				var img = document.createElement("img");
+				img.loading = "lazy";
+				img.src = "library/" + lang + "/" + curBook.id + ".spr/book.img/" + curChapter.id + "/" + group[0].split("?")[0];
+				img.alt = group[0].split("?")[1];
+				parent.appendChild(img);
+				group = group.slice(1);
+				for (var p of group) {
+					var caption = document.createElement("p");
+					caption.innerHTML = p;
+					parent.appendChild(caption);
+				}
+			} else {
+				for (var line of group.split(/\n(?=[^(?=\s*\~)(?=\s*\#)(?=\s*\_)])/g)) {
+					if (line.startsWith("@")) {
+						var i = document.createElement("h" + (parseInt(line.charAt(1)) + 4));
+						i.innerHTML = line.split("\n")[0].slice(2);
+						parent.appendChild(i);
+						line = line.split("\n").slice(1).join("\n");
+					}
+					if (hLevel > 0 && hLevel <= 4) {
+						var item = document.createElement("h" + (hLevel + 2));
+						item.innerHTML = line;
+					} else if (/^#/m.exec(line)) {
+						var item = document.createElement("ol");
+						item.classList.add("numbered");
+						for (var subLine of line.split("\n")) {
+							if (subLine.startsWith("#") || subLine.startsWith("_")) {
+								var subItem = document.createElement("li");
+								if (subLine.startsWith("_")) {
+									subItem.classList.add("nomarker");
+								}
+								subItem.innerHTML = subLine.replace(/(#|_)\s*/, "");
+								item.appendChild(subItem);
+							} else {
+								var subItem = document.createElement("p");
+								subItem.innerHTML = subLine;
+								parent.appendChild(subItem);
+							}
+						}
+					} else if (/^~/m.exec(line)) {
+						var item = document.createElement("ul");
+						for (var subLine of line.split("\n")) {
+							if (l = /^\s?(?=~|_)/g.exec(subLine)) {
+								var subItem = document.createElement("li");
+								if (/^\s?_/.exec(subLine)) {
+									subItem.classList.add("nomarker");
+								}
+								if (l[0].length > 0) {
+									subItem.classList.add("nomarker");
+									var list = document.createElement("ul");
+									var subList = document.createElement("li");
+									subList.innerHTML = subLine.replace(/\s*(~|_)\s*/, "");
+									list.appendChild(subList);
+									subItem.appendChild(list);
+								} else {
+									subItem.innerHTML = subLine.replace(/(~|_)\s*/, "");
+								}
+								item.appendChild(subItem);
+							} else {
+								var subItem = document.createElement("p");
+								subItem.innerHTML = subLine;
+								parent.appendChild(subItem);
+							}
+						}
+					} else if (/^_/m.exec(line)) {
+						var item = document.createElement("ul");
+						for (var subLine of line.split("\n")) {
+							if (subLine.startsWith("_")) {
+								var subItem = document.createElement("li");
+								subItem.classList.add("nomarker");
+								subItem.innerHTML = subLine.replace(/_\s*/, "");
+								item.appendChild(subItem);
+							} else {
+								var subItem = document.createElement("p");
+								subItem.innerHTML = subLine;
+								parent.appendChild(subItem);
+							}
+						}
+					} else if (line != "<hr>") {
+						var item = document.createElement("p");
+						item.innerHTML = line;
+					}
+					if (line == "<hr>") {
+						parent = document.createElement("hr");
+					} else {
+						parent.appendChild(item);
+					}
+				}
+			}
+			el.appendChild(parent);
 		}
 	} else {
 		el.textContent = text;
@@ -255,10 +404,16 @@ function notify(type, msg, info, buttons) {
 	}
 	document.body.classList.add("alert");
 }
+function format(string) {
+	return string.replaceAll(/`(.*?)`/g, "<em>$1</em>");
+}
+function noFormat(string) {
+	return string.replaceAll(/`(.*?)`/g, "$1").replaceAll(/<em>(.*?)<\/em>/g, "$1");
+}
 function swap(el, txt, timing) {
 	el.classList.add("swapping");
 	setTimeout(function () {
-		el.textContent = txt;
+		el.innerHTML = format(txt);
 		el.classList.remove("swapping");
 	}, timing * 500);
 }
@@ -321,7 +476,7 @@ function slide(page, tab, data, load) {
 			break;
 		case "collection":
 			setBack(function () { slide("library", "lib") }, "Library");
-			document.title = data.name || "Collection";
+			document.title = noFormat(data.name) || "Collection";
 			swap(title, data.name || "Collection", .35);
 			curCollection = data;
 			if (load) {
@@ -333,7 +488,7 @@ function slide(page, tab, data, load) {
 				var ccs = curCollection.short;
 			}
 			setBack(function () { slide("collection", "lib", curCollection, false) }, ccs || curCollection.name);
-			document.title = data.name || "Book";
+			document.title = noFormat(data.name) || "Book";
 			swap(title, data.name || "Book", .35);
 			curBook = data;
 			curPart = { "id": "SKIP" };
@@ -343,7 +498,7 @@ function slide(page, tab, data, load) {
 			break;
 		case "part":
 			setBack(function () { slide("book", null, curBook, false) }, curBook.short || curBook.name);
-			document.title = data.name || "Part";
+			document.title = noFormat(data.name) || "Part";
 			swap(title, data.name || "Part", .35);
 			curPart = data;
 			if (load) {
@@ -371,7 +526,7 @@ function slide(page, tab, data, load) {
 			} else {
 				setBack(function () { slide("part", null, curPart, false) }, pLabel);
 			}
-			document.title = label;
+			document.title = noFormat(label);
 			swap(title, label || "Chapter", .35);
 			curChapter = data;
 			if (load) {
@@ -421,7 +576,7 @@ function libCatalog() { // Get collections
 					});
 				});
 				var label = document.createElement("p");
-				label.textContent = collection.name;
+				label.innerHTML = format(collection.name);
 				(function () {
 					var c = collection;
 					item.addEventListener("click", function () {
@@ -498,7 +653,7 @@ function collectionCatalog() { // Get books
 				var l = label;
 				readBinaryFile("library/" + lang + "/" + bookID + ".spr/book.stc", function (success, book) {
 					if (success) {
-						l.textContent = book.name;
+						l.innerHTML = format(book.name);
 						i.addEventListener("click", function () {
 							slide("book", null, book, document.getElementById("parts").innerHTML == "" || bID != curBook.id); // Load parts the first time, then if different book
 						});
@@ -542,16 +697,15 @@ function bookCatalog() { // Get parts
 				for (var part of book.parts) {
 					var item = document.createElement("li");
 					var label = document.createElement("p");
-					var tc = document.createTextNode(part.name);
 					if (part.before) {
 						var before = document.createElement("span");
-						before.textContent = part.before;
+						before.innerHTML = format(part.before);
 						label.appendChild(before);
 					}
-					label.appendChild(tc);
+					label.insertAdjacentHTML("beforeend", format(part.name)); // Add part name to label
 					if (part.after) {
 						var after = document.createElement("span");
-						after.textContent = part.after;
+						after.innerHTML = format(part.after);
 						label.appendChild(after);
 					}
 					(function () {
@@ -603,16 +757,15 @@ function partCatalog() { // Get chapters
 		for (var chapter of chapters) {
 			var item = document.createElement("li");
 			var label = document.createElement("p");
-			var tc = document.createTextNode(chapter.name);
 			if (chapter.before) {
 				var before = document.createElement("span");
-				before.textContent = chapter.before;
+				before.innerHTML = format(chapter.before);
 				label.appendChild(before);
 			}
-			label.appendChild(tc);
+			label.insertAdjacentHTML("beforeend", format(chapter.name)); // Add chapter name to label
 			if (chapter.after) {
 				var after = document.createElement("span");
-				after.textContent = chapter.after;
+				after.innerHTML = format(chapter.after);
 				label.appendChild(after);
 			}
 			(function () {
@@ -677,9 +830,10 @@ function chapterCatalog(id) { // Get article
 		document.getElementById("chapter").style.display = "none";
 		document.getElementById("summary").style.display = "none";
 		document.getElementById("head").style.display = "";
-		document.getElementById("heading").textContent = curChapter.title || curChapter.name;
-		document.getElementById("subheading").textContent = curChapter.subtitle || "";
-		document.getElementById("intro").textContent = curChapter.intro || "";
+		document.getElementById("supheading").innerHTML = format(curChapter.before || "");
+		document.getElementById("heading").innerHTML = format(curChapter.title || curChapter.name);
+		document.getElementById("subheading").innerHTML = format(curChapter.subtitle || curChapter.after || "");
+		document.getElementById("intro").innerHTML = format(curChapter.intro || "");
 		document.getElementById("superhead").style.display = "";
 		(function () {
 			var c = curChapter;
@@ -698,16 +852,17 @@ function chapterCatalog(id) { // Get article
 		for (var chapter of partCache) { // Search for selected chapter
 			if (chapter.id == curChapter.id) {
 				if (chapter.first == true) { // Populate heading above first chapter
-					document.getElementById("heading").textContent = curPart.title || "";
-					document.getElementById("subheading").textContent = curPart.subtitle || "";
-					document.getElementById("intro").textContent = curPart.intro || "";
+					document.getElementById("supheading").textContent = "";
+					document.getElementById("heading").innerHTML = format(curPart.title || "");
+					document.getElementById("subheading").innerHTML = format(curPart.subtitle || "");
+					document.getElementById("intro").innerHTML = format(curPart.intro || "");
 					document.getElementById("superhead").style.display = "";
 				} else {
 					document.getElementById("superhead").style.display = "none";
 				}
 				document.getElementById("chapter").style.display = "";
 				document.getElementById("summary").style.display = "";
-				document.getElementById("chapter").textContent = chapter.title || chapter.name;
+				document.getElementById("chapter").textContent = format(chapter.title || chapter.name);
 				document.getElementById("summary-text").textContent = chapter.summary || "";
 				(function () {
 					var c = chapter;
@@ -753,7 +908,93 @@ function parseNote(el, note) {
 	if (note.cross) {
 		for (var n of note.cross) {
 			var item = document.createElement("li");
-			item.textContent = n;
+			var path = n.split("/");
+			var chapter = path[2].split(":")[0];
+			var ref = path[2].split(":")[1];
+			var list = ref.split("#")[0].split(",");
+			var verses = [];
+			for (var v of list) {
+				if (v.includes("-")) {
+					for (var i = parseInt(v.split("-")[0]); i <= parseInt(v.split("-")[1]); i++) {
+						verses.push(i);
+					}
+				} else {
+					verses.push(parseInt(v));
+				}
+			}
+			var target = ref.split("#")[1];
+			(function () {
+				var nn = n;
+				var i = item;
+				var p = path;
+				var c = chapter;
+				var v = verses;
+				var t = target;
+				var l = document.createElement("p");
+				l.classList.add("label");
+				l.addEventListener("click", function () {
+					notify("message", "Note Clicked", nn, { "OK": null });
+				});
+				i.appendChild(l);
+				readLines("library/" + lang + "/" + p[0] + ".spr/" + p[1] + "/" + c + ".sch", v, function (success, selection) {
+					if (success) {
+						var passage = document.createElement("ol");
+						passage.classList.add("reader");
+						parse(passage, "verse", selection.join("\n"));
+						var remove = passage.getElementsByTagName("sup");
+						while (remove.length) {
+							remove[0].parentNode.removeChild(remove[0]);
+						}
+						for (var el of passage.querySelectorAll("[id], [onclick]")) {
+							el.removeAttribute("id");
+							el.removeAttribute("onclick");
+						}
+						for (var x = 0; x < v.length; x++) {
+							passage.children[x].dataset.counter = v[x];
+							if (t && v[x] == t) {
+								passage.children[x].classList.add("target");
+							} else if (!t && v[x] == v[0]) {
+								passage.children[x].classList.add("target");
+							}
+						}
+						if (t && v.length > 1) {
+							var m = document.createElement("button");
+							var s = document.createElement("i");
+							i.classList.add("more");
+							s.classList.add("gs");
+							s.textContent = "chevron-right";
+							m.addEventListener("click", function () {
+								i.classList.toggle("show");
+							});
+							m.appendChild(s);
+							i.appendChild(m);
+							Gust();
+						}
+						i.appendChild(passage);
+					}
+				});
+				readBinaryFile("library/" + lang + "/" + p[0] + ".spr/book.stc", function (success, book) {
+					if (success) {
+						p[2] = p[2].replaceAll("-", "–");
+						if (book.parts && book.parts.length > 0) { // If book found
+							l.textContent = p[1] + " " + p[2].split("#")[0];
+							var b = document.createElement("span");
+							b.innerHTML = format(book.name);
+							l.appendChild(b);
+							for (var part of book.parts) { // Search for selected part
+								if (part.id == p[1]) {
+									l.innerHTML = format(part.name) + " " + p[2].split("#")[0];
+									l.appendChild(b);
+								}
+							}
+						} else {
+							l.textContent = nn;
+						}
+					} else {
+						l.textContent = nn;
+					}
+				});
+			})();
 			el.appendChild(item);
 		}
 	}
@@ -775,6 +1016,7 @@ function note(link) {
 			break;
 		}
 	}
+	document.getElementById("inspector").classList.toggle("clarity", document.getElementById("switch-clarity").checked);
 	slide("inspector", null, id);
 	document.getElementById("inspector-title").textContent = t;
 	var element = document.getElementById("notes");
@@ -799,9 +1041,25 @@ function note(link) {
 		})();
 	}
 }
-// readLines("/eng/nt.spr/matt/2.sch", [2, 3, 6, 18, 20, 21, 22], function (selection) {
-// 	console.log(selection);
-// });
+
+function prev() {
+	if (partCache.indexOf(curChapter) > 0) {
+		slide("reader", null, partCache[partCache.indexOf(curChapter) - 1]);
+	} else if (bookCache.indexOf(curPart) > 0) {
+		curPart = bookCache[bookCache.indexOf(curPart) - 1];
+		partCatalog();
+		slide("reader", null, curPart.chapters[curPart.chapters.length - 1]);
+	}
+}
+function next() {
+	if (partCache.indexOf(curChapter) < partCache.length - 1) {
+		slide("reader", null, partCache[partCache.indexOf(curChapter) + 1]);
+	} else if (bookCache.indexOf(curPart) < bookCache.length - 1) {
+		curPart = bookCache[bookCache.indexOf(curPart) + 1];
+		partCatalog();
+		slide("reader", null, curPart.chapters[0]);
+	}
+}
 
 function touchStart(e, t) {
 	t.x = e.touches[0].clientX;
@@ -814,21 +1072,21 @@ function touchEnd(e, t, f) { // Functions listed [right, left, up, down]
 	var xDiff = t.x - e.changedTouches[0].clientX;
 	var yDiff = (t.y - e.changedTouches[0].clientY) * 1.25;
 	if (Math.abs(xDiff) > Math.abs(yDiff)) {
-		if (xDiff >= 10) { // Left
+		if (xDiff >= 16) { // Left
 			if (f[1]) {
 				f[1](t.x >= document.body.clientWidth - 25);
 			}
-		} else if (xDiff <= 10) { // Right
+		} else if (xDiff <= 16) { // Right
 			if (f[0]) {
 				f[0](t.x <= 25);
 			}
 		}
 	} else if (f.length > 2 && Math.abs(yDiff) > Math.abs(xDiff)) {
-		if (yDiff >= 10) { // Up
+		if (yDiff >= 16) { // Up
 			if (f[2]) {
 				f[2](t.y >= document.body.clientHeight - 25);
 			}
-		} else if (yDiff <= 10) { // Down
+		} else if (yDiff <= 16) { // Down
 			if (f[3]) {
 				f[3](t.y <= 25);
 			}
@@ -838,12 +1096,20 @@ function touchEnd(e, t, f) { // Functions listed [right, left, up, down]
 	t.y = null;
 }
 document.getElementById("content").addEventListener("touchstart", function (e) { touchStart(e, contentTouch) });
-document.getElementById("content").addEventListener("touchend", function (e) { touchEnd(e, contentTouch, [function (edge) {
-	if (edge || document.getElementById("reader").classList.contains("hidden")) {
-		closeInspector();
-		back.click();
+document.getElementById("content").addEventListener("touchend", function (e) { touchEnd(e, contentTouch, [
+	function (edge) {
+		if (edge || document.getElementById("reader").classList.contains("hidden")) {
+			closeInspector();
+			back.click();
+		} else if (!edge && document.getElementById("part").classList.contains("hidden") && !document.getElementById("reader").classList.contains("hidden")) {
+			prev();
+		}
+	}, function (edge) {
+		if (!edge && document.getElementById("part").classList.contains("hidden") && !document.getElementById("reader").classList.contains("hidden")) {
+			next();
+		}
 	}
-}, null])});
+])});
 document.getElementById("modal").addEventListener("touchstart", function (e) {
 	if (!window.matchMedia("(max-height: 600px)").matches && (e.target.closest("#modal-header") || document.getElementById("modal-content").scrollTop <= 0)) {
 		touchStart(e, modalTouch);
